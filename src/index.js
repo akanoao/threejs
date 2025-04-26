@@ -3,6 +3,8 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
 import { gsap } from "gsap/gsap-core";
+import { ScrollTrigger } from "gsap/all";
+gsap.registerPlugin(ScrollTrigger);
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -10,6 +12,10 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.NeutralToneMapping;
 renderer.outputEncoding = THREE.sRGBEncoding;
 document.querySelector("#app").appendChild(renderer.domElement);
+
+// Enable shadow map
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 // Camera
 const camera = new THREE.PerspectiveCamera(
@@ -45,21 +51,42 @@ scene.add(ambientLight);
 const backLight = new THREE.SpotLight(0xffffff, 100, 20, 0.5, 1, 2);
 backLight.position.set(0, 0, 4);
 backLight.castShadow = true;
+backLight.shadow.mapSize.width = 1024;
+backLight.shadow.mapSize.height = 1024;
+backLight.shadow.camera.near = 0.5;
+backLight.shadow.camera.far = 20;
 scene.add(backLight);
+
+// Add a ground plane to catch shadows
+const groundGeo = new THREE.PlaneGeometry(200, 200);
+const groundMat = new THREE.ShadowMaterial({ opacity: 0.4 });
+const ground = new THREE.Mesh(groundGeo, groundMat);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = -1; // adjust to just below your car
+ground.receiveShadow = true;
+scene.add(ground);
 
 // Load Model
 const loader = new GLTFLoader();
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 let carModel = null;
 loader.load("porsche_gt3_rs.glb", (gltf) => {
     carModel = gltf.scene;
     gltf.scene.rotation.set(0, Math.PI / 2, Math.PI / 2);
     gltf.scene.position.set(-8, 0, 0);
+
+    // Enable casting shadows on all mesh children
+    gltf.scene.traverse((child) => {
+        if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = false;
+            // optional: child.material.side = THREE.DoubleSide;
+        }
+    });
+
     scene.add(gltf.scene);
 });
 
-scene.environmentIntensity = 0.5;
+scene.environmentIntensity = 1;
 
 const minX = -8;
 const maxX = 8;
@@ -67,7 +94,21 @@ let scrollProgress = 0;
 let currentSection = null;
 let previousSection = null;
 
-// Listen for scroll events and update scrollProgress
+// gsap.to(".paralax1", {
+//     scrollTrigger: {
+//         trigger: ".paralax1",
+//         toggleActions: "play none none reverse",
+//         start: "top top",
+//         end: "bottom top",
+//         scrub: 1,
+//         pin: true,
+//         anticipatePin: 1,
+//         markers: true,
+//     },
+//     duration: 3,
+//     x: 100,
+// });
+
 window.addEventListener("scroll", () => {
     const maxScroll = document.body.scrollHeight - window.innerHeight;
     scrollProgress = window.scrollY / 368;
@@ -78,6 +119,7 @@ window.addEventListener("scroll", () => {
     }
 
     if (carModel) {
+        console.log(carModel.position);
         const sections = document.querySelectorAll(".paralax");
         let foundSection = null;
         sections.forEach((section) => {
@@ -90,18 +132,15 @@ window.addEventListener("scroll", () => {
         // Section changed: Entering a section
         if (foundSection && currentSection !== foundSection) {
             currentSection = foundSection;
+            backLight.position.set(0, 10, 0);
+            carModel.position.set(8, -1, 1);
+            carModel.rotation.set(Math.PI / 2, -Math.PI / 2, Math.PI / 2);
             gsap.to(carModel.position, {
                 duration: 1,
                 x: 0,
-                y: 0,
-                z: -1,
+                y: -1,
+                z: 1,
                 ease: "power1.out",
-            });
-            gsap.to(carModel.rotation, {
-                duration: 1,
-                x: Math.PI / 2,
-                y: -Math.PI / 2,
-                z: Math.PI / 2,
             });
         }
         // Section changed: Leaving all sections (scrolling up)
