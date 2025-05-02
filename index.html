@@ -3,82 +3,169 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Porsche GT3 RS - Step 3</title>
+        <title>Porsche GT3 RS Experience</title>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
             href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
             rel="stylesheet"
         />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+                }
+            }
+        </script>
         <style>
             /* Basic Reset & Body Styling */
             html {
                 margin: 0;
                 padding: 0;
                 width: 100%;
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE and Edge */
+                overflow-x: hidden;
                 font-family: "Anton", sans-serif;
-                background-color: #000; /* Set background on html */
-                color: #fff;
-                /* Enable standard browser scrolling */
-                overflow-y: scroll;
-                scrollbar-width: thin; /* Optional: style scrollbar */
-                scrollbar-color: #555 #000; /* Optional: style scrollbar */
+                overflow-y: scroll; /* Ensure vertical scroll is enabled */
             }
             html::-webkit-scrollbar {
-                width: 8px; /* Optional: style scrollbar */
-            }
-            html::-webkit-scrollbar-track {
-                background: #000; /* Optional: style scrollbar */
-            }
-            html::-webkit-scrollbar-thumb {
-                background-color: #555; /* Optional: style scrollbar */
-                border-radius: 4px; /* Optional: style scrollbar */
-                border: 2px solid #000; /* Optional: style scrollbar */
+                display: none; /* Chrome, Safari, Opera */
             }
 
             body {
                 margin: 0;
                 padding: 0;
-                /* Body height will be determined by content */
+                /* Body height will be determined by the total height of panels */
+                height: auto;
+                background-color: #000;
+                color: #fff;
                 overflow-x: hidden; /* Prevent horizontal scroll */
-                position: relative; /* Needed for z-index context if children use absolute/fixed */
+            }
+
+            /* Video Container Styling */
+            .video-container {
+                display: block;
+                position: fixed; /* Fixed position to stay behind content */
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 100%;
+                background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
+                z-index: 1; /* Behind content, above background */
+                overflow: hidden; /* Ensure video doesn't overflow */
+            }
+
+            #bg-video {
+                display: block;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%); /* Center the video */
+                min-width: 100%;
+                min-height: 100%;
+                width: auto;
+                height: auto;
+                object-fit: cover; /* Ensure video aspect ratio is maintained */
+            }
+
+            /* Three.js Canvas Container */
+            #app {
+                display: block;
+                position: fixed; /* Fixed position for the 3D scene */
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                pointer-events: none; /* Allow clicks to pass through initially */
+                z-index: 3; /* Above video and text panels */
+            }
+            #app canvas {
+                display: block; /* Prevent extra space below canvas */
+            }
+
+            /* Text Styling */
+            h1 {
+                font-size: 25vw; /* Slightly smaller for better fit */
+                color: #fff;
+                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+                margin: 0;
+                padding: 0;
+                font-family: "Anton", sans-serif;
+                font-weight: 900;
+                letter-spacing: -0.03em; /* Adjust spacing */
+                line-height: 0.9;
+                text-align: left;
+                width: 100%;
+            }
+
+            h2 {
+                font-size: 6vw;
+                color: #fff;
+                text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+                margin: 0 0 2vh 0; /* Add some bottom margin */
+                padding: 0;
+                font-family: "Anton", sans-serif;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                text-align: center; /* Center section titles */
+                width: 80%; /* Limit width */
+            }
+
+            .highlight-text {
+                font-size: 2.5vw; /* Adjusted size */
+                color: #d10000; /* Porsche Red */
+                margin: 1vh 0 3vh 0; /* Adjusted margin */
+                max-width: 80%;
+                text-align: inherit; /* Inherit alignment from parent */
+                font-weight: normal; /* Use default weight */
             }
 
             /* Panel Container Styling */
             .container {
+                position: relative; /* Needed for panel positioning */
+                height: auto; /* Height determined by content */
                 width: 100%;
-                position: relative; /* Establish stacking context for panels */
-                z-index: 2; /* Panels sit above background video */
+                z-index: 2; /* Above video, below 3D model */
+                padding: 0;
+                border: none;
             }
 
             /* Individual Section Panel Styling */
             .panel {
-                height: 100vh; /* Each panel is full viewport height */
+                height: 100vh; /* Each section is full viewport height */
                 width: 100%;
-                display: flex; /* Use flexbox for alignment */
+                display: flex;
                 flex-direction: column;
-                align-items: center; /* Default: Center items horizontally */
-                justify-content: center; /* Default: Center items vertically */
+                align-items: center; /* Default center alignment */
+                justify-content: center; /* Default center alignment */
+                background-color: transparent; /* Allow video bg */
+                margin: 0;
                 padding: 5vw; /* Add some padding */
                 box-sizing: border-box; /* Include padding in height/width */
-                position: relative; /* For potential absolute children later */
-                border-bottom: 1px dashed #333; /* Temporary border to see sections */
+                position: relative; /* Needed for absolute positioned children */
+                color: #fff; /* Ensure text is white */
             }
 
             /* Specific Panel Alignments */
             #zero {
-                height: 50vh;
-                border-bottom: 1px dashed red;
-                justify-content: flex-end;
-                padding-bottom: 2vh;
+                background-color: transparent;
+                height: 100vh; /* Keep initial panel full height for intro scroll */
+                justify-content: flex-end; /* Align content to the bottom */
+                padding-bottom: 10vh;
                 text-align: center;
                 font-size: 0.8em;
                 color: #555;
             }
 
             #one {
-                align-items: flex-start;
-                justify-content: flex-start;
+                align-items: flex-start; /* Align text left */
+                justify-content: flex-start; /* Align text top */
                 padding-top: 15vh;
                 padding-left: 5vw;
             }
@@ -86,79 +173,48 @@
             #two,
             #three,
             #four {
-                text-align: center;
+                align-items: center;
+                justify-content: center;
+                text-align: center; /* Center text within these panels */
             }
 
-            /* Basic Text Styling */
-            h1 {
-                font-size: clamp(60px, 20vw, 250px);
-                margin-bottom: 1vh;
-                line-height: 0.9;
-                text-align: inherit;
+            /* Porsche brand color accents */
+            .accent-box {
+                position: absolute;
+                bottom: 20vh;
+                left: 5vw; /* Align with text padding */
+                width: 0; /* Initial width for animation */
+                height: 0.8vh; /* Slightly thicker */
+                background-color: #d10000; /* Porsche Red */
+            }
+            #two .accent-box,
+            #three .accent-box,
+            #four .accent-box {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0; /* Initial width for animation */
+            }
+            #two .accent-box,
+            #three .accent-box,
+            #four .accent-box {
+                bottom: 25vh; /* Adjust position for centered layout */
             }
 
-            h2 {
-                font-size: clamp(30px, 6vw, 70px);
-                margin-bottom: 2vh;
-                text-align: inherit;
-            }
-
-            .highlight-text {
-                font-size: clamp(16px, 2.5vw, 28px);
-                color: #d10000;
-                margin-top: 1vh;
-                max-width: 80%;
-                text-align: inherit;
-                font-weight: normal;
-            }
-
-            /* Hidden elements from Step 1 */
-            .accent-box,
             .section-number {
-                display: none;
+                position: absolute;
+                top: 5vh;
+                right: 5vw;
+                font-size: 3vw;
+                opacity: 0; /* Start hidden */
+                color: rgba(
+                    255,
+                    255,
+                    255,
+                    0.6
+                ); /* Slightly transparent white */
             }
 
-            /* Fixed UI Elements (Logo, Nav Dots, Vignette) */
-            .logo {
-                position: fixed;
-                top: 3vh;
-                left: 3vw;
-                height: 4vh;
-                width: auto;
-                z-index: 10;
-                opacity: 0.8;
-                pointer-events: none;
-                color: #ffffff;
-                font-family: "Anton", sans-serif;
-                font-size: 3vh;
-                font-weight: bold;
-                text-transform: uppercase;
-                letter-spacing: 0.1em;
-            }
-            .nav-dots {
-                position: fixed;
-                right: 3vw;
-                top: 50%;
-                transform: translateY(-50%);
-                z-index: 10;
-                display: flex;
-                flex-direction: column;
-                gap: 2vh;
-                opacity: 0.8;
-            }
-            .nav-dot {
-                width: 1vw;
-                height: 1vw;
-                min-width: 10px;
-                min-height: 10px;
-                border-radius: 50%;
-                background-color: rgba(255, 255, 255, 0.5);
-                transition: background-color 0.3s ease;
-            }
-            .nav-dot.active {
-                background-color: #d10000;
-                transform: scale(1.3);
-            }
+            /* Vignette effect */
             .vignette {
                 position: fixed;
                 top: 0;
@@ -166,68 +222,117 @@
                 width: 100%;
                 height: 100%;
                 box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
-                pointer-events: none;
-                z-index: 4;
+                pointer-events: none; /* Allow clicks through */
+                z-index: 4; /* Above 3D model */
             }
 
-            /* --- Step 3: Background Video Styling --- */
-            .video-section {
-                /* This section tag is just a semantic container, no styles needed */
+            /* Logo positioning */
+            .logo {
+                position: fixed;
+                top: 3vh;
+                left: 3vw;
+                width: auto; /* Adjust width automatically */
+                height: 4vh; /* Control size by height */
+                z-index: 10; /* Above everything */
+                opacity: 0.8;
+                pointer-events: none; /* Prevent interaction with logo */
+                color: #ffffff;
+                font-family: "Anton", sans-serif;
+                font-size: 3vh; /* Match height */
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
             }
 
-            .video-container {
-                display: block;
-                position: fixed; /* Fixed position behind everything */
-                top: 0;
-                left: 0;
-                height: 100vh;
-                width: 100%;
-                background-color: rgba(
-                    0,
-                    0,
-                    0,
-                    0.6
-                ); /* Optional dark overlay */
-                z-index: 1; /* Lowest z-index, behind .container */
-                overflow: hidden; /* Prevent video overflow */
-            }
-
-            #bg-video {
-                display: block;
-                position: absolute; /* Position relative to video-container */
+            /* Navigation dots */
+            .nav-dots {
+                position: fixed;
+                right: 3vw;
                 top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%); /* Center the video */
-                min-width: 100%; /* Ensure video covers container width */
-                min-height: 100%; /* Ensure video covers container height */
-                width: auto; /* Maintain aspect ratio */
-                height: auto; /* Maintain aspect ratio */
-                object-fit: cover; /* Cover the container, cropping if needed */
-                /* clip-path: url(#clip-circle); /* We'll add this back later */
+                transform: translateY(-50%);
+                z-index: 11; /* Above everything */
+                display: flex;
+                flex-direction: column;
+                gap: 2vh;
+                opacity: 0.8;
+                pointer-events: auto; /* Allow clicking dots */
+            }
+
+            .nav-dot {
+                width: 1vw;
+                height: 1vw;
+                min-width: 10px; /* Minimum size */
+                min-height: 10px;
+                border-radius: 50%;
+                background-color: rgb(255, 255, 255);
+                transition: all 0.3s ease;
+                cursor: pointer; /* Indicate clickable */
+            }
+
+            .active {
+                background-color: #d10000; /* Porsche Red */
+                transform: scale(1.3);
+            }
+
+            /* Feature highlight text (positioned via JS later) */
+            #feature-highlights {
+                position: fixed;
+                /* Positioning will be controlled by JS based on section */
+                color: white;
+                z-index: 5; /* Above vignette */
+                font-size: 2vw;
+                font-family: "Anton", sans-serif;
+                opacity: 0; /* Start hidden */
+                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+                pointer-events: none;
+                background-color: rgba(0, 0, 0, 0.3); /* Subtle background */
+                padding: 1vw 2vw;
+                border-radius: 8px;
+                max-width: 40%; /* Limit width */
+                text-align: center;
+                transition: opacity 0.5s ease-in-out; /* Smooth fade */
+            }
+            #current-highlight {
+                margin: 0;
+                padding: 0;
             }
         </style>
     </head>
     <body>
         <div class="logo">PORSCHE</div>
+
         <div class="nav-dots">
             <div class="nav-dot" data-section="zero"></div>
-            <div class="nav-dot active" data-section="one"></div>
+            <div class="nav-dot" data-section="one"></div>
             <div class="nav-dot" data-section="two"></div>
             <div class="nav-dot" data-section="three"></div>
             <div class="nav-dot" data-section="four"></div>
         </div>
+
         <div class="vignette"></div>
 
         <section class="video-section">
             <div class="video-container">
                 <video autoplay muted loop playsinline id="bg-video">
-                    <source src="PV18_0001_HD - Trim.mov" type="video/mp4" />
+                    <source
+                        src="PV18_0001_HD - Trim.mov"
+                        type="video/mp4"
+                        onerror="this.parentElement.innerHTML = '<p style=\'color: red; text-align: center; padding-top: 40vh;\'>Error loading video.</p>';"
+                    />
                     Your browser does not support the video tag.
                 </video>
             </div>
         </section>
+
+        <div id="app"></div>
+
+        <div id="feature-highlights">
+            <p id="current-highlight"></p>
+        </div>
+
         <div class="container">
             <section id="zero" class="panel">(Scroll Down to Begin)</section>
+
             <section id="one" class="panel">
                 <h1>GT3 RS</h1>
                 <div class="highlight-text">
@@ -236,6 +341,7 @@
                 <div class="accent-box"></div>
                 <div class="section-number">01</div>
             </section>
+
             <section id="two" class="panel">
                 <h2>PURE RACING TECHNOLOGY</h2>
                 <div class="highlight-text">
@@ -244,6 +350,7 @@
                 <div class="accent-box"></div>
                 <div class="section-number">02</div>
             </section>
+
             <section id="three" class="panel">
                 <h2>MASTERFUL DOWNFORCE</h2>
                 <div class="highlight-text">AERODYNAMIC PRECISION</div>
@@ -259,10 +366,308 @@
         </div>
 
         <script type="module">
-            console.log(
-                "Step 3 Loaded: Added background video element and styling."
-            );
-            // No JS interaction with video yet.
+            // Import necessary Three.js components (will be used in later steps)
+            import * as THREE from "three";
+            import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+            import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+            import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
+
+            // === GSAP & ScrollTrigger Setup ===
+            // Register GSAP plugins
+            gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+            // --- Global Variables (for Three.js - will be used later) ---
+            let camera,
+                scene,
+                renderer,
+                controls, // OrbitControls instance (currently disabled)
+                carModel, // Loaded GLTF model
+                lights, // Object containing scene lights
+                featureHighlightContainer, // DOM element for feature text box
+                currentHighlightElement; // DOM element for the text inside the box
+
+            // Text content for each section's highlight feature (for later steps)
+            const featureTexts = {
+                one: "GT3 RS: Track DNA",
+                two: "Engine: 518 HP Naturally Aspirated",
+                three: "Aero: Active Downforce System",
+                four: "Performance: Nürburgring Tuned",
+            };
+
+            // --- Initialization ---
+            document.addEventListener("DOMContentLoaded", () => {
+                // Setup navigation dots functionality
+                setupNavDots();
+                // Animate in the initial static elements (logo, nav dots)
+                animateIntro();
+                // Setup scroll-triggered animations for text elements in each section
+                setupSectionTextAnimations();
+                // Setup the background video reveal animation (will be added back later)
+                // setupBackgroundVideoReveal();
+                // Initialize the Three.js Scene, load models, and setup 3D animations (will be implemented in later steps)
+                // initThreeJS();
+
+                // --- Step 4: GSAP Snap Scrolling ---
+                setupSnapScrolling(); // Changed function name
+
+                // Optional: Fade video slightly on deep scroll for effect (can be added later)
+                ScrollTrigger.create({
+                    trigger: "body",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 0.5,
+                    onUpdate: (self) => {
+                        gsap.to(".video-container", {
+                            opacity: 1 - self.progress * 0.4, // Fade to 60% opacity
+                            ease: "none",
+                            overwrite: "auto",
+                        });
+                    },
+                });
+            });
+
+            // --- GSAP Animation Setup Functions ---
+
+            /**
+             * Sets up GSAP ScrollTrigger for snap-to-section scrolling.
+             */
+            function setupSnapScrolling() {
+                const panels = gsap.utils.toArray(".panel"); // Get all panels including #zero
+                const numPanels = panels.length;
+
+                ScrollTrigger.create({
+                    trigger: "body", // Trigger on the body for overall page scroll
+                    start: "top top", // Start the snapping effect from the top of the page
+                    end: "bottom bottom", // End the snapping effect at the bottom of the page
+                    // markers: true, // Uncomment for debugging
+                    snap: {
+                        // Snap to equally spaced points based on the number of panels
+                        snapTo: 1 / (numPanels - 1),
+                        duration: { min: 0.5, max: 0.8 }, // Smoothness of the snap
+                        ease: "power2.inOut", // Easing for the snap animation
+                    },
+                    // Optional: Add a small tolerance to make snapping less aggressive
+                    // tolerance: 0.1,
+                });
+            }
+
+            /**
+             * Sets up click events for navigation dots and updates active dot based on scroll.
+             */
+            function setupNavDots() {
+                const navDots = document.querySelectorAll(".nav-dot");
+                const sections = document.querySelectorAll(".panel"); // Get all panels
+
+                // Create ScrollTriggers for each section to update the active dot
+                sections.forEach((section, index) => {
+                    ScrollTrigger.create({
+                        trigger: section,
+                        start: "top center+=10%", // Trigger slightly past the center when scrolling down
+                        end: "bottom center-=10%", // End trigger slightly before center when scrolling down
+                        // markers: true, // Uncomment for debugging dot triggers
+                        onEnter: () => setActiveDot(section.id), // Update dot when entering section view
+                        onEnterBack: () => setActiveDot(section.id), // Update dot when scrolling back into section view
+                    });
+                });
+
+                // Add click event to navigation dots for smooth scrolling
+                navDots.forEach((dot) => {
+                    dot.addEventListener("click", () => {
+                        const targetSectionId =
+                            dot.getAttribute("data-section");
+                        const targetSection =
+                            document.getElementById(targetSectionId);
+                        if (targetSection) {
+                            // Use GSAP's ScrollToPlugin for smooth scrolling
+                            gsap.to(window, {
+                                scrollTo: {
+                                    y: targetSection, // Target element to scroll to
+                                    offsetY: 1, // Small offset to ensure trigger fires correctly
+                                },
+                                duration: 1.2, // Duration of the scroll animation
+                                ease: "power2.inOut", // Easing function
+                            });
+                        }
+                    });
+                });
+            }
+
+            /**
+             * Updates the visual state of navigation dots.
+             * @param {string} sectionId - The ID of the currently active section.
+             */
+            function setActiveDot(sectionId) {
+                document.querySelectorAll(".nav-dot").forEach((dot) => {
+                    if (dot.getAttribute("data-section") === sectionId) {
+                        dot.classList.add("active");
+                    } else {
+                        dot.classList.remove("active");
+                    }
+                });
+            }
+
+            /**
+             * Creates the initial fade-in/pop-in animation for static UI elements.
+             */
+            function animateIntro() {
+                const tl = gsap.timeline({ delay: 0.5 }); // Add a small delay for smoother start
+
+                // Animate logo fade-in from top
+                tl.from(".logo", {
+                    y: -50,
+                    opacity: 0,
+                    duration: 1,
+                    ease: "power3.out",
+                });
+
+                // Animate navigation dots scaling in with a stagger effect
+                tl.from(
+                    ".nav-dots", // Target the fixed nav dots
+                    {
+                        scale: 0,
+                        opacity: 0,
+                        duration: 0.5,
+                        stagger: 0.1, // Animate dots one after another
+                        ease: "back.out(1.7)", // Add a slight overshoot effect
+                    },
+                    "-=0.5" // Overlap start slightly with logo animation
+                );
+            }
+
+            /**
+             * Sets up scroll-triggered animations for text elements within each content panel.
+             */
+            function setupSectionTextAnimations() {
+                // Select all panels except the initial empty one (#zero)
+                document
+                    .querySelectorAll(".panel:not(#zero)")
+                    .forEach((section) => {
+                        // Find elements within the section to animate
+                        const elementsToAnimate = section.querySelectorAll(
+                            "h1, h2, .highlight-text"
+                        );
+                        const accentBox = section.querySelector(".accent-box");
+                        const sectionNumber =
+                            section.querySelector(".section-number");
+                        const targetAccentWidth =
+                            section.id === "one" ? "40vw" : "30vw";
+
+                        const tl = gsap.timeline({
+                            scrollTrigger: {
+                                trigger: section,
+                                start: "top center+=20%",
+                                toggleActions: "play none none reset",
+                                // markers: true,
+                            },
+                        });
+
+                        tl.from(elementsToAnimate, {
+                            y: 50,
+                            opacity: 0,
+                            duration: 0.8,
+                            ease: "power3.out",
+                            stagger: 0.15,
+                        });
+
+                        if (accentBox) {
+                            tl.fromTo(
+                                accentBox,
+                                { width: 0 },
+                                {
+                                    width: targetAccentWidth,
+                                    duration: 1,
+                                    ease: "power3.inOut",
+                                },
+                                "-=0.5"
+                            );
+                        }
+
+                        if (sectionNumber) {
+                            gsap.fromTo(
+                                sectionNumber,
+                                { opacity: 0, y: -20 },
+                                {
+                                    opacity: 0.6,
+                                    y: 0,
+                                    duration: 0.8,
+                                    ease: "power3.out",
+                                    scrollTrigger: {
+                                        trigger: section,
+                                        start: "top center+=20%",
+                                        toggleActions: "play none none reverse",
+                                    },
+                                }
+                            );
+                        }
+                    });
+            }
+
+            /**
+             * Sets up the initial background video reveal.
+             * (Implementation for later steps)
+             */
+            function setupBackgroundVideoReveal() {
+                // ... (code for video reveal)
+            }
+
+            // --- Three.js Setup Functions (for later steps) ---
+
+            /**
+             * Initializes the Three.js scene, camera, renderer, loads assets, and sets up controls.
+             * (Implementation for later steps)
+             */
+            function initThreeJS() {
+                // ... (code for Three.js initialization)
+            }
+
+            /**
+             * Creates and configures the lights for the scene.
+             * (Implementation for later steps)
+             */
+            const createLighting = () => {
+                // ... (code for lighting)
+            };
+
+            /**
+             * Handles window resize events.
+             * (Implementation for later steps)
+             */
+            function onWindowResize() {
+                if (camera && renderer) {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                }
+            }
+
+            /**
+             * The main animation loop.
+             * (Implementation for later steps)
+             */
+            function animate() {
+                requestAnimationFrame(animate);
+                if (renderer && scene && camera) {
+                    renderer.render(scene, camera);
+                }
+            }
+
+            // --- Scroll-Based 3D Animations (for later steps) ---
+
+            /**
+             * Sets up GSAP ScrollTriggers for 3D model and camera animations.
+             * (Implementation for later steps)
+             */
+            function setupScrollAnimations() {
+                // ... (code for 3D scroll animations)
+            }
+
+            /**
+             * Updates the text content and positions the feature highlight box.
+             * (Implementation for later steps)
+             */
+            function updateFeatureHighlight(text, position = "center") {
+                // ... (code for feature highlights)
+            }
         </script>
     </body>
 </html>
