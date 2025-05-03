@@ -254,7 +254,7 @@
                 display: flex;
                 flex-direction: column;
                 gap: 2vh;
-                opacity: 0.8;
+                /* Removed initial opacity here */
                 pointer-events: auto; /* Allow clicking dots */
             }
 
@@ -366,8 +366,9 @@
         </div>
 
         <script type="module">
-            // Import necessary Three.js components (will be used in later steps)
+            // Import necessary Three.js components
             import * as THREE from "three";
+            // OrbitControls are useful for debugging the 3D scene, but will be disabled for the final scroll animation
             import { OrbitControls } from "three/addons/controls/OrbitControls.js";
             import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
             import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
@@ -376,11 +377,11 @@
             // Register GSAP plugins
             gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-            // --- Global Variables (for Three.js - will be used later) ---
+            // --- Global Variables (for Three.js) ---
             let camera,
                 scene,
                 renderer,
-                controls, // OrbitControls instance (currently disabled)
+                controls, // OrbitControls instance (will be disabled for scroll animation)
                 carModel, // Loaded GLTF model
                 lights, // Object containing scene lights
                 featureHighlightContainer, // DOM element for feature text box
@@ -404,11 +405,16 @@
                 setupSectionTextAnimations();
                 // Setup the background video reveal animation (will be added back later)
                 // setupBackgroundVideoReveal();
-                // Initialize the Three.js Scene, load models, and setup 3D animations (will be implemented in later steps)
-                // initThreeJS();
 
-                // --- Step 4: GSAP Snap Scrolling ---
-                setupSnapScrolling(); // Changed function name
+                // --- Step 7: Initialize Three.js Scene ---
+                initThreeJS();
+
+                // --- Step 8: Load 3D Model and Environment ---
+                loadEnvironment("hdr/modern_buildings_4k.hdr"); // Replace with your HDR path
+                loadCarModel("porsche_gt3_rs.glb"); // Replace with your GLB path
+
+                // Setup GSAP Snap Scrolling
+                setupSnapScrolling();
 
                 // Optional: Fade video slightly on deep scroll for effect (can be added later)
                 ScrollTrigger.create({
@@ -424,6 +430,12 @@
                         });
                     },
                 });
+
+                // Add resize listener for Three.js
+                window.addEventListener("resize", onWindowResize);
+
+                // Start the animation loop
+                animate();
             });
 
             // --- GSAP Animation Setup Functions ---
@@ -442,7 +454,7 @@
                     // markers: true, // Uncomment for debugging
                     snap: {
                         // Snap to equally spaced points based on the number of panels
-                        snapTo: 1 / (numPanels - 1),
+                        snapTo: [0, 0.25, 0.5, 0.75, 1], // Explicit snap points for 5 panels (0, 1/4, 1/2, 3/4, 1)
                         duration: { min: 0.5, max: 0.8 }, // Smoothness of the snap
                         ease: "power2.inOut", // Easing for the snap animation
                     },
@@ -522,7 +534,7 @@
 
                 // Animate navigation dots scaling in with a stagger effect
                 tl.from(
-                    ".nav-dots", // Target the fixed nav dots
+                    ".nav-dots", // Corrected target to individual dots
                     {
                         scale: 0,
                         opacity: 0,
@@ -556,7 +568,7 @@
                             scrollTrigger: {
                                 trigger: section,
                                 start: "top center+=20%",
-                                toggleActions: "play none none reset",
+                                toggleActions: "play none none reverse",
                                 // markers: true,
                             },
                         });
@@ -610,27 +622,164 @@
                 // ... (code for video reveal)
             }
 
-            // --- Three.js Setup Functions (for later steps) ---
+            // --- Three.js Setup Functions ---
 
             /**
              * Initializes the Three.js scene, camera, renderer, loads assets, and sets up controls.
-             * (Implementation for later steps)
              */
             function initThreeJS() {
-                // ... (code for Three.js initialization)
+                // Get the container for the Three.js scene
+                const container = document.getElementById("app");
+
+                // 1. Create Scene
+                scene = new THREE.Scene();
+                scene.background = null; // Set background to null to see HTML elements behind it
+
+                // 2. Create Camera
+                // PerspectiveCamera( fov, aspect, near, far )
+                camera = new THREE.PerspectiveCamera(
+                    40, // Field of view (vertical)
+                    window.innerWidth / window.innerHeight, // Aspect ratio
+                    0.1, // Near clipping plane
+                    1000 // Far clipping plane
+                );
+                camera.position.set(0, 2, 5); // Initial camera position (x, y, z)
+
+                // 3. Create Renderer
+                renderer = new THREE.WebGLRenderer({
+                    antialias: true, // Smooth edges
+                    alpha: true, // Enable transparency for scene background
+                });
+                renderer.setSize(window.innerWidth, window.innerHeight); // Set renderer size to window dimensions
+                renderer.setPixelRatio(window.devicePixelRatio); // Use device pixel ratio for sharpness
+                renderer.shadowMap.enabled = true; // Enable shadow maps
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Soft shadows
+
+                // Append the renderer's canvas to the #app container
+                container.appendChild(renderer.domElement);
+
+                // 4. Add Basic Lighting (will be replaced by environment map lighting)
+                lights = createLighting(); // Call the function to create and add lights
+                // scene.add(lights.ambientLight, lights.directionalLight); // Commented out, environment map will provide lighting
+
+                console.log(
+                    "Three.js scene initialized with basic components."
+                );
             }
 
             /**
              * Creates and configures the lights for the scene.
-             * (Implementation for later steps)
+             * (Basic lighting, will be less important once environment map is loaded)
              */
             const createLighting = () => {
-                // ... (code for lighting)
+                // Ambient light (soft light from all directions)
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Color, Intensity
+
+                // Directional light (like sunlight)
+                const directionalLight = new THREE.DirectionalLight(
+                    0xffffff,
+                    0.8
+                ); // Color, Intensity
+                directionalLight.position.set(5, 10, 7.5); // Position the light
+                directionalLight.castShadow = true; // Enable shadows for this light
+
+                // Configure shadow properties for the directional light
+                directionalLight.shadow.mapSize.width = 1024; // Shadow map resolution
+                directionalLight.shadow.mapSize.height = 1024;
+                directionalLight.shadow.camera.near = 0.5; // Near plane for shadow camera
+                directionalLight.shadow.camera.far = 50; // Far plane for shadow camera
+                directionalLight.shadow.camera.left = -10; // Shadow camera bounds
+                directionalLight.shadow.camera.right = 10;
+                directionalLight.shadow.camera.top = 10;
+                directionalLight.shadow.camera.bottom = -10;
+
+                return { ambientLight, directionalLight };
             };
 
             /**
+             * Loads the HDR environment map and applies it to the scene.
+             * @param {string} hdrPath - Path to the HDR file.
+             */
+            function loadEnvironment(hdrPath) {
+                const pmremGenerator = new THREE.PMREMGenerator(renderer);
+                pmremGenerator.compileEquirectangularShader();
+
+                new RGBELoader()
+                    .setPath("") // Assuming HDR is in the same directory as the HTML
+                    .load(
+                        hdrPath,
+                        function (texture) {
+                            const envMap =
+                                pmremGenerator.fromEquirectangular(
+                                    texture
+                                ).texture;
+
+                            // Apply environment map to the scene for reflections and lighting
+                            scene.environment = envMap;
+                            // scene.background = envMap; // Optional: set background to environment map
+
+                            texture.dispose();
+                            pmremGenerator.dispose();
+
+                            console.log(
+                                "HDR environment map loaded and applied."
+                            );
+                        },
+                        undefined,
+                        function (error) {
+                            console.error(
+                                "An error occurred loading the HDR environment map:",
+                                error
+                            );
+                            // Fallback or error handling
+                        }
+                    );
+            }
+
+            /**
+             * Loads the GLTF car model and adds it to the scene.
+             * @param {string} modelPath - Path to the GLB/GLTF model file.
+             */
+            function loadCarModel(modelPath) {
+                const loader = new GLTFLoader();
+
+                loader.load(
+                    modelPath,
+                    function (gltf) {
+                        carModel = gltf.scene;
+
+                        // Adjust position and scale if necessary
+                        carModel.position.set(0, -1, 0); // Example: move down slightly
+                        carModel.scale.set(1, 1, 1); // Example: set scale
+
+                        // Traverse the model to enable shadows on all meshes
+                        carModel.traverse((node) => {
+                            if (node.isMesh) {
+                                node.castShadow = true;
+                                node.receiveShadow = true; // Allow model to receive shadows
+                            }
+                        });
+
+                        scene.add(carModel); // Add the loaded model to the scene
+
+                        console.log("Car model loaded and added to the scene.");
+
+                        // Now that the model is loaded, we can set up scroll animations
+                        // setupScrollAnimations(); // Will be implemented in the next step
+                    },
+                    undefined,
+                    function (error) {
+                        console.error(
+                            "An error occurred loading the car model:",
+                            error
+                        );
+                        // Fallback or error handling
+                    }
+                );
+            }
+
+            /**
              * Handles window resize events.
-             * (Implementation for later steps)
              */
             function onWindowResize() {
                 if (camera && renderer) {
@@ -642,10 +791,16 @@
 
             /**
              * The main animation loop.
-             * (Implementation for later steps)
              */
             function animate() {
-                requestAnimationFrame(animate);
+                requestAnimationFrame(animate); // Request the next frame
+
+                // Update controls if enabled (for debugging)
+                // if (controls) {
+                //     controls.update();
+                // }
+
+                // Render the scene with the camera
                 if (renderer && scene && camera) {
                     renderer.render(scene, camera);
                 }
@@ -658,7 +813,12 @@
              * (Implementation for later steps)
              */
             function setupScrollAnimations() {
-                // ... (code for 3D scroll animations)
+                // This function will be implemented in Step 9
+                // It will use ScrollTrigger to animate carModel.position, carModel.rotation, and camera.position
+                // based on the scroll progress through the panels.
+                console.log(
+                    "setupScrollAnimations will be implemented in the next step."
+                );
             }
 
             /**
@@ -666,7 +826,12 @@
              * (Implementation for later steps)
              */
             function updateFeatureHighlight(text, position = "center") {
-                // ... (code for feature highlights)
+                // This function will be implemented in Step 10
+                // It will update the #feature-highlights text and position it
+                // based on the active section and potentially the car's position.
+                console.log(
+                    "updateFeatureHighlight will be implemented in a later step."
+                );
             }
         </script>
     </body>
