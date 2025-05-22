@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Porsche GT3 RS Experience</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
+            rel="stylesheet"
+        />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+                }
+            }
+        </script>
+        <style>
+            /* Basic Reset & Body Styling */
+            html {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                scrollbar-width: none; /* Firefox */
+                -ms-overflow-style: none; /* IE and Edge */
+                overflow-x: hidden;
+                font-family: "Anton", sans-serif;
+                overflow-y: scroll; /* Ensure vertical scroll is enabled */
+            }
+            html::-webkit-scrollbar {
+                display: none; /* Chrome, Safari, Opera */
+            }
+
+            body {
+                margin: 0;
+                padding: 0;
+                /* Adjust height based on number of sections and desired scroll length */
+                /* Height = (Num Sections) * 100vh should be enough */
+                height: 100vh; /* 5 sections (0-4) * 100vh */
+                background-color: #000;
+                color: #fff;
+                overflow-x: hidden; /* Prevent horizontal scroll */
+                /* overflow-y: hidden; /* Let html handle scroll */
+            }
+
+            /* SVG definitions container - REMOVED */
+            /* .svg-defs { ... } */
+
+            /* Video Container Styling */
+            .video-container {
+                display: block;
+                position: absolute; /* Fixed position to stay behind content */
+                top: 0;
+                left: 0;
+                height: 100vh;
+                width: 100%;
+                background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
+                z-index: 1; /* Behind content, above background */
+                overflow: hidden; /* Ensure video doesn't overflow */
+            }
+
+            #bg-video {
+                display: block;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%); /* Center the video */
+                min-width: 100%;
+                min-height: 100%;
+                width: auto;
+                height: auto;
+                /* Apply the clip-path - REMOVED */
+                /* clip-path: url(#clip-circle); */
+                /* Ensure video aspect ratio is maintained */
+                object-fit: cover;
+            }
+
+            /* Three.js Canvas Container */
+            #app {
+                display: block;
+                position: fixed; /* Fixed position for the 3D scene */
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                pointer-events: none; /* Allow clicks to pass through initially */
+                z-index: 3; /* Above video and text panels */
+            }
+            #app canvas {
+                display: block; /* Prevent extra space below canvas */
+            }
+
+            /* Text Styling */
+            h1 {
+                font-size: 25vw; /* Slightly smaller for better fit */
+                color: #fff;
+                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+                margin: 0;
+                padding: 0;
+                font-family: "Anton", sans-serif;
+                font-weight: 900;
+                letter-spacing: -0.03em; /* Adjust spacing */
+                line-height: 0.9;
+                text-align: left;
+                width: 100%;
+            }
+
+            h2 {
+                font-size: 6vw;
+                color: #fff;
+                text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+                margin: 0 0 2vh 0; /* Add some bottom margin */
+                padding: 0;
+                font-family: "Anton", sans-serif;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                text-align: center; /* Center section titles */
+                width: 80%; /* Limit width */
+            }
+
+            .highlight-text {
+                font-size: 2.5vw; /* Adjusted size */
+                color: #d10000; /* Porsche Red */
+                margin: 1vh 0 3vh 0; /* Adjusted margin */
+                max-width: 80%;
+                text-align: inherit; /* Inherit alignment from parent */
+                font-weight: normal; /* Use default weight */
+            }
+
+            /* Panel Container Styling */
+            .container {
+                position: relative; /* Changed from absolute to allow pinning */
+                height: 100vh;
+                width: 100%;
+                z-index: 2; /* Above video, below 3D model */
+                padding: 0;
+                border: none;
+            }
+
+            /* Individual Section Panel Styling */
+            .panel {
+                height: 100vh; /* Each section should define a scroll length */
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center; /* Default center alignment */
+                justify-content: center; /* Default center alignment */
+                background-color: transparent; /* Allow video bg */
+                margin: 0;
+                padding: 5vw; /* Add some padding */
+                box-sizing: border-box; /* Include padding in height/width */
+                position: relative; /* Needed for absolute positioned children */
+                color: #fff; /* Ensure text is white */
+            }
+
+            /* Specific Panel Alignments */
+            #zero {
+                background-color: transparent;
+                height: 50vh; /* Make the initial buffer smaller */
+            }
+
+            #one {
+                align-items: flex-start; /* Align text left */
+                justify-content: flex-start; /* Align text top */
+                padding-top: 15vh;
+                padding-left: 5vw;
+            }
+
+            #two,
+            #three,
+            #four {
+                align-items: center;
+                justify-content: center;
+                text-align: center; /* Center text within these panels */
+            }
+
+            /* Porsche brand color accents */
+            .accent-box {
+                position: absolute;
+                bottom: 20vh;
+                left: 5vw; /* Align with text padding */
+                width: 0; /* Initial width for animation */
+                height: 0.8vh; /* Slightly thicker */
+                background-color: #d10000; /* Porsche Red */
+            }
+            #two .accent-box,
+            #three .accent-box,
+            #four .accent-box {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 0; /* Initial width for animation */
+            }
+            #two .accent-box,
+            #three .accent-box,
+            #four .accent-box {
+                bottom: 25vh; /* Adjust position for centered layout */
+            }
+
+            .section-number {
+                position: absolute;
+                top: 5vh;
+                right: 5vw;
+                font-size: 3vw;
+                opacity: 0; /* Start hidden */
+                color: rgba(
+                    255,
+                    255,
+                    255,
+                    0.6
+                ); /* Slightly transparent white */
+            }
+
+            /* Vignette effect */
+            .vignette {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
+                pointer-events: none; /* Allow clicks through */
+                z-index: 4; /* Above 3D model */
+            }
+
+            /* Logo positioning */
+            .logo {
+                position: fixed;
+                top: 3vh;
+                left: 3vw;
+                width: auto; /* Adjust width automatically */
+                height: 4vh; /* Control size by height */
+                z-index: 10; /* Above everything */
+                opacity: 0.8;
+                pointer-events: none; /* Prevent interaction with logo */
+                color: #ffffff;
+                font-family: "Anton", sans-serif;
+                font-size: 3vh; /* Match height */
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+            }
+
+            /* Navigation dots */
+            .nav-dots {
+                position: fixed;
+                right: 3vw;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 11; /* Above everything */
+                display: flex;
+                flex-direction: column;
+                gap: 2vh;
+                opacity: 0.8;
+                pointer-events: auto; /* Allow clicking dots */
+            }
+
+            .nav-dot {
+                width: 1vw;
+                height: 1vw;
+                min-width: 10px; /* Minimum size */
+                min-height: 10px;
+                border-radius: 50%;
+                background-color: rgb(255, 255, 255);
+                transition: all 0.3s ease;
+                cursor: pointer; /* Indicate clickable */
+            }
+
+            .active {
+                background-color: #d10000; /* Porsche Red */
+                transform: scale(1.3);
+            }
+
+            /* Feature highlight text (positioned via JS later) */
+            #feature-highlights {
+                position: fixed;
+                /* Positioning will be controlled by JS based on section */
+                color: white;
+                z-index: 5; /* Above vignette */
+                font-size: 2vw;
+                font-family: "Anton", sans-serif;
+                opacity: 0; /* Start hidden */
+                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+                pointer-events: none;
+                background-color: rgba(0, 0, 0, 0.3); /* Subtle background */
+                padding: 1vw 2vw;
+                border-radius: 8px;
+                max-width: 40%; /* Limit width */
+                text-align: center;
+                transition: opacity 0.5s ease-in-out; /* Smooth fade */
+            }
+            #current-highlight {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="logo">PORSCHE</div>
+
+        <div class="nav-dots">
+            <div class="nav-dot" data-section="zero"></div>
+            <div class="nav-dot" data-section="one"></div>
+            <div class="nav-dot" data-section="two"></div>
+            <div class="nav-dot" data-section="three"></div>
+            <div class="nav-dot" data-section="four"></div>
+        </div>
+
+        <!-- <div class="vignette"></div> -->
+
+        <section class="video-section">
+            <div class="video-container">
+                <video autoplay muted loop playsinline id="bg-video">
+                    <source
+                        src="PV18_0001_HD - Trim.mov"
+                        type="video/mp4"
+                        onerror="this.parentElement.innerHTML = '<p style=\'color: red; text-align: center; padding-top: 40vh;\'>Error loading video.</p>';"
+                    />
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+        </section>
+
+        <div id="app"></div>
+
+        <div id="feature-highlights">
+            <p id="current-highlight"></p>
+        </div>
+
+        <div class="container">
+            <section id="zero" class="panel"></section>
+
+            <section id="one" class="panel">
+                <h1>GT3 RS</h1>
+                <div class="highlight-text">
+                    BORN ON THE TRACK, BUILT FOR THE ROAD
+                </div>
+                <div class="accent-box"></div>
+                <div class="section-number">01</div>
+            </section>
+
+            <section id="two" class="panel">
+                <h2>PURE RACING TECHNOLOGY</h2>
+                <div class="highlight-text">
+                    518 HP NATURALLY ASPIRATED ENGINE
+                </div>
+                <div class="accent-box"></div>
+                <div class="section-number">02</div>
+            </section>
+
+            <section id="three" class="panel">
+                <h2>MASTERFUL DOWNFORCE</h2>
+                <div class="highlight-text">AERODYNAMIC PRECISION</div>
+                <div class="accent-box"></div>
+                <div class="section-number">03</div>
+            </section>
+
+            <section id="four" class="panel">
+                <h2>PERFECTLY CALIBRATED</h2>
+                <div class="highlight-text">TRACK-READY PERFORMANCE</div>
+                <div class="accent-box"></div>
+                <div class="section-number">04</div>
+            </section>
+        </div>
+
+        <script type="module">
+            // Import necessary Three.js components
+            import * as THREE from "three";
+            import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+            import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+            import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
+
+            // === GSAP & ScrollTrigger Setup ===
+            // Register GSAP plugins
+            gsap.registerPlugin(ScrollTrigger, ScrollToPlugin); // Added ScrollToPlugin
+
+            // --- Global Variables ---
+            let camera,
+                scene,
+                renderer,
+                controls, // OrbitControls instance (currently disabled)
+                carModel, // Loaded GLTF model
+                lights, // Object containing scene lights
+                featureHighlightContainer, // DOM element for feature text box
+                currentHighlightElement; // DOM element for the text inside the box
+
+            // Text content for each section's highlight feature
+            const featureTexts = {
+                one: "GT3 RS: Track DNA",
+                two: "Engine: 518 HP Naturally Aspirated",
+                three: "Aero: Active Downforce System",
+                four: "Performance: Nürburgring Tuned",
+            };
+
+            // --- Initialization ---
+            document.addEventListener("DOMContentLoaded", () => {
+                // Setup navigation dots functionality
+                setupNavDots();
+                // Animate in the initial static elements (logo, nav dots)
+                animateIntro();
+                // Setup scroll-triggered animations for text elements in each section
+                setupSectionTextAnimations();
+                // Setup the background video reveal animation - REMOVED
+                // setupBackgroundVideoReveal();
+                // Initialize the Three.js Scene, load models, and setup 3D animations
+                initThreeJS(); // This will call setupScrollAnimations() after model loads
+
+                // Optional: Fade video slightly on deep scroll for effect (Moved here from removed function)
+                ScrollTrigger.create({
+                    trigger: "body", // Trigger based on overall page scroll
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: 0.5, // Smoothly interpolate values based on scroll position
+                    onUpdate: (self) => {
+                        // Fade the video container's opacity as the user scrolls down
+                        gsap.to(".video-container", {
+                            opacity: 1 - self.progress * 0.4, // Fade up to 40% (opacity 0.6)
+                            ease: "none", // Linear fade for smooth scrubbing
+                            overwrite: "auto", // Prevent conflicting animations
+                        });
+                    },
+                });
+            });
+
+            // --- GSAP Animation Setup Functions ---
+
+            /**
+             * Sets up click events for navigation dots and updates active dot based on scroll.
+             */
+            function setupNavDots() {
+                const navDots = document.querySelectorAll(".nav-dot");
+                const sections = document.querySelectorAll(".panel"); // Get all panels
+
+                // Set initial active state (usually 'zero' or 'one')
+                setActiveDot("zero"); // Start with the first dot active
+
+                // Create ScrollTriggers for each section to update the active dot
+                sections.forEach((section, index) => {
+                    ScrollTrigger.create({
+                        trigger: section,
+                        start: "top center+=10%", // Trigger slightly past the center when scrolling down
+                        end: "bottom center-=10%", // End trigger slightly before center when scrolling down
+                        // markers: true, // Uncomment for debugging dot triggers
+                        onEnter: () => setActiveDot(section.id), // Update dot when entering section view
+                        onEnterBack: () => setActiveDot(section.id), // Update dot when scrolling back into section view
+                    });
+                });
+
+                // Add click event to navigation dots for smooth scrolling
+                navDots.forEach((dot) => {
+                    dot.addEventListener("click", () => {
+                        const targetSectionId =
+                            dot.getAttribute("data-section");
+                        const targetSection =
+                            document.getElementById(targetSectionId);
+                        if (targetSection) {
+                            // Use GSAP's ScrollToPlugin for smooth scrolling
+                            gsap.to(window, {
+                                scrollTo: {
+                                    y: targetSection, // Target element to scroll to
+                                    offsetY: 1, // Small offset to ensure trigger fires correctly
+                                },
+                                duration: 1.2, // Duration of the scroll animation
+                                ease: "power2.inOut", // Easing function
+                            });
+                        }
+                    });
+                });
+            }
+
+            /**
+             * Updates the visual state of navigation dots.
+             * @param {string} sectionId - The ID of the currently active section.
+             */
+            function setActiveDot(sectionId) {
+                document.querySelectorAll(".nav-dot").forEach((dot) => {
+                    if (dot.getAttribute("data-section") === sectionId) {
+                        dot.classList.add("active");
+                    } else {
+                        dot.classList.remove("active");
+                    }
+                });
+            }
+
+            /**
+             * Creates the initial fade-in/pop-in animation for static UI elements.
+             */
+            function animateIntro() {
+                const tl = gsap.timeline({ delay: 0.5 }); // Add a small delay for smoother start
+
+                // Animate logo fade-in from top
+                tl.from(".logo", {
+                    y: -50,
+                    opacity: 0,
+                    duration: 1,
+                    ease: "power3.out",
+                });
+
+                // Animate navigation dots scaling in with a stagger effect
+                tl.from(
+                    ".nav-dot",
+                    {
+                        scale: 0,
+                        opacity: 0,
+                        duration: 0.5,
+                        stagger: 0.1, // Animate dots one after another
+                        ease: "back.out(1.7)", // Add a slight overshoot effect
+                    },
+                    "-=0.5" // Overlap start slightly with logo animation
+                );
+            }
+
+            /**
+             * Sets up scroll-triggered animations for text elements within each content panel.
+             */
+            function setupSectionTextAnimations() {
+                // Select all panels except the initial empty one (#zero)
+                document
+                    .querySelectorAll(".panel:not(#zero)")
+                    .forEach((section) => {
+                        // Find elements within the section to animate
+                        const elementsToAnimate = section.querySelectorAll(
+                            "h1, h2, .highlight-text"
+                        );
+                        const accentBox = section.querySelector(".accent-box");
+                        const sectionNumber =
+                            section.querySelector(".section-number");
+                        const targetAccentWidth =
+                            section.id === "one" ? "40vw" : "30vw";
+
+                        const tl = gsap.timeline({
+                            scrollTrigger: {
+                                trigger: section,
+                                start: "top center+=20%",
+                                toggleActions: "play none none reverse",
+                                // markers: true,
+                            },
+                        });
+
+                        tl.from(elementsToAnimate, {
+                            y: 50,
+                            opacity: 0,
+                            duration: 0.8,
+                            ease: "power3.out",
+                            stagger: 0.15,
+                        });
+
+                        if (accentBox) {
+                            tl.fromTo(
+                                accentBox,
+                                { width: 0 },
+                                {
+                                    width: targetAccentWidth,
+                                    duration: 1,
+                                    ease: "power3.inOut",
+                                },
+                                "-=0.5"
+                            );
+                        }
+
+                        if (sectionNumber) {
+                            gsap.fromTo(
+                                sectionNumber,
+                                { opacity: 0, y: -20 },
+                                {
+                                    opacity: 0.6,
+                                    y: 0,
+                                    duration: 0.8,
+                                    ease: "power3.out",
+                                    scrollTrigger: {
+                                        trigger: section,
+                                        start: "top center+=20%",
+                                        toggleActions: "play none none reverse",
+                                    },
+                                }
+                            );
+                        }
+                    });
+            }
+
+            /**
+             * Sets up the initial background video reveal - FUNCTION REMOVED
+             */
+            // function setupBackgroundVideoReveal() { ... }
+
+            // --- Three.js Setup Functions ---
+
+            /**
+             * Initializes the Three.js scene, camera, renderer, loads assets, and sets up controls.
+             */
+            function initThreeJS() {
+                const appContainer = document.querySelector("#app");
+                if (!appContainer) {
+                    console.error("Three.js container #app not found.");
+                    return;
+                }
+
+                renderer = new THREE.WebGLRenderer({
+                    antialias: true,
+                    alpha: true,
+                });
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.toneMapping = THREE.ACESFilmicToneMapping;
+                renderer.toneMappingExposure = 1.0;
+                renderer.outputColorSpace = THREE.SRGBColorSpace;
+                renderer.shadowMap.enabled = true;
+                renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+                appContainer.appendChild(renderer.domElement);
+
+                camera = new THREE.PerspectiveCamera(
+                    45,
+                    window.innerWidth / window.innerHeight,
+                    0.1,
+                    1000
+                );
+                camera.position.set(0, 1, 6);
+
+                scene = new THREE.Scene();
+                scene.background = null;
+
+                new RGBELoader().setPath("./public/hdr/").load(
+                    "modern_buildings_4k.hdr",
+                    (texture) => {
+                        texture.mapping =
+                            THREE.EquirectangularReflectionMapping;
+                        scene.environment = texture;
+                        scene.environmentIntensity = 0.8;
+                        console.log("HDR Environment map loaded successfully.");
+                    },
+                    undefined,
+                    (error) => {
+                        console.error(
+                            "Error loading HDR environment map:",
+                            error
+                        );
+                        if (!lights) {
+                            lights = createLighting();
+                            console.log("Created fallback lighting.");
+                        }
+                    }
+                );
+
+                lights = createLighting();
+
+                const groundGeo = new THREE.PlaneGeometry(200, 200);
+                const groundMat = new THREE.ShadowMaterial({ opacity: 0.4 });
+                const ground = new THREE.Mesh(groundGeo, groundMat);
+                ground.rotation.x = -Math.PI / 2;
+                ground.position.y = -1.5;
+                ground.receiveShadow = true;
+                scene.add(ground);
+
+                featureHighlightContainer =
+                    document.getElementById("feature-highlights");
+                currentHighlightElement =
+                    document.getElementById("current-highlight");
+                if (!featureHighlightContainer || !currentHighlightElement) {
+                    console.warn("Feature highlight elements not found.");
+                }
+
+                const loader = new GLTFLoader();
+                loader.load(
+                    "public/porsche_gt3_rs.glb",
+                    (gltf) => {
+                        console.log("GLTF model loaded successfully.");
+                        carModel = gltf.scene;
+                        carModel.rotation.set(0, Math.PI * 0.8, 0);
+                        carModel.position.set(0, -1.5, 0);
+                        carModel.scale.set(1.2, 1.2, 1.2);
+
+                        carModel.traverse((child) => {
+                            if (child.isMesh) {
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                                if (child.material) {
+                                    child.material.envMapIntensity = 1.5;
+                                    if (
+                                        child.material.metalness !== undefined
+                                    ) {
+                                        child.material.metalness = Math.max(
+                                            child.material.metalness,
+                                            0.5
+                                        );
+                                        child.material.color.set(0x222222);
+                                    }
+                                    if (
+                                        child.material.roughness !== undefined
+                                    ) {
+                                        child.material.roughness = Math.min(
+                                            child.material.roughness,
+                                            0.6
+                                        );
+                                    }
+                                    child.material.needsUpdate = true;
+                                }
+                            }
+                        });
+
+                        scene.add(carModel);
+                        setupScrollAnimations();
+                        animate();
+                    },
+                    undefined, // Progress callback removed for brevity
+                    (error) => {
+                        console.error("Error loading GLTF model:", error);
+                        appContainer.innerHTML = `<p style="color: red; text-align: center; padding-top: 20vh;">Failed to load 3D model. Check file path and console.</p>`;
+                    }
+                );
+
+                window.addEventListener("resize", onWindowResize);
+            }
+
+            /**
+             * Creates and configures the lights for the scene.
+             */
+            const createLighting = () => {
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+                scene.add(ambientLight);
+
+                const mainLight = new THREE.DirectionalLight(0xffffff, 2.5);
+                mainLight.position.set(5, 10, 7);
+                mainLight.castShadow = true;
+                mainLight.shadow.mapSize.width = 2048;
+                mainLight.shadow.mapSize.height = 2048;
+                mainLight.shadow.camera.near = 0.5;
+                mainLight.shadow.camera.far = 50;
+                mainLight.shadow.camera.left = -15;
+                mainLight.shadow.camera.right = 15;
+                mainLight.shadow.camera.top = 15;
+                mainLight.shadow.camera.bottom = -15;
+                mainLight.shadow.bias = -0.001;
+                scene.add(mainLight);
+
+                const fillLight = new THREE.DirectionalLight(0xabcdef, 0.6);
+                fillLight.position.set(-5, 5, -5);
+                fillLight.castShadow = false;
+                scene.add(fillLight);
+
+                return { mainLight, fillLight, ambientLight };
+            };
+
+            /**
+             * Handles window resize events.
+             */
+            function onWindowResize() {
+                if (camera && renderer) {
+                    camera.aspect = window.innerWidth / window.innerHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(window.innerWidth, window.innerHeight);
+                }
+            }
+
+            /**
+             * The main animation loop.
+             */
+            function animate() {
+                requestAnimationFrame(animate);
+                if (renderer && scene && camera) {
+                    renderer.render(scene, camera);
+                }
+            }
+
+            // --- Scroll-Based 3D Animations ---
+
+            /**
+             * Sets up GSAP ScrollTriggers for 3D model and camera animations.
+             */
+            function setupScrollAnimations() {
+                if (!carModel) {
+                    console.warn(
+                        "setupScrollAnimations called before carModel was loaded."
+                    );
+                    return;
+                }
+
+                ScrollTrigger.create({
+                    trigger: ".container",
+                    pin: false,
+                    start: "top top",
+                    end: () =>
+                        `+=${
+                            document.querySelector(".container").scrollHeight -
+                            window.innerHeight
+                        }`,
+                    // markers: true,
+                    invalidateOnRefresh: true,
+                });
+
+                // --- Section Zero ---
+                ScrollTrigger.create({
+                    trigger: "#zero",
+                    start: "top bottom",
+                    end: "bottom top",
+                    // markers: true,
+                    onEnter: () => {
+                        gsap.to(carModel.rotation, {
+                            y: Math.PI * 0.8,
+                            duration: 0.5,
+                            ease: "power1.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(carModel.position, {
+                            x: 0,
+                            y: -1.5,
+                            z: 0,
+                            duration: 0.5,
+                            ease: "power1.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(camera.position, {
+                            x: 0,
+                            y: 1,
+                            z: 6,
+                            duration: 0.5,
+                            ease: "power1.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(featureHighlightContainer, {
+                            opacity: 0,
+                            duration: 0.3,
+                            overwrite: true,
+                        });
+                    },
+                    onEnterBack: () => {
+                        gsap.to(featureHighlightContainer, {
+                            opacity: 0,
+                            duration: 0.3,
+                            overwrite: true,
+                        });
+                    },
+                });
+
+                // --- Section One ---
+                ScrollTrigger.create({
+                    trigger: "#one",
+                    start: "top center",
+                    end: "bottom center",
+                    // markers: true,
+                    onEnter: () => {
+                        gsap.to(carModel.rotation, {
+                            duration: 1.5,
+                            y: Math.PI * 0.4,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(carModel.position, {
+                            duration: 1.5,
+                            x: -0.5,
+                            y: -1.5,
+                            z: 0.5,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(camera.position, {
+                            duration: 1.5,
+                            x: 0,
+                            y: 0.5,
+                            z: 5.5,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        updateFeatureHighlight(featureTexts.one, "left");
+                    },
+                    onLeaveBack: () => {
+                        gsap.to(carModel.rotation, {
+                            duration: 1.0,
+                            y: Math.PI * 0.8,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(carModel.position, {
+                            duration: 1.0,
+                            x: 0,
+                            y: -1.5,
+                            z: 0,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(camera.position, {
+                            duration: 1.0,
+                            x: 0,
+                            y: 1,
+                            z: 6,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                    },
+                    onEnterBack: () => {
+                        updateFeatureHighlight(featureTexts.one, "left");
+                    },
+                });
+
+                // --- Section Two ---
+                ScrollTrigger.create({
+                    trigger: "#two",
+                    start: "top center",
+                    end: "bottom center",
+                    // markers: true,
+                    onEnter: () => {
+                        gsap.to(carModel.rotation, {
+                            duration: 1.5,
+                            y: -Math.PI * 0.6,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(carModel.position, {
+                            duration: 1.5,
+                            x: 0.8,
+                            y: -1.5,
+                            z: 0.2,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(camera.position, {
+                            duration: 1.5,
+                            x: 1.5,
+                            y: 0.8,
+                            z: 4.5,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        updateFeatureHighlight(featureTexts.two, "right");
+                    },
+                    onLeaveBack: () => {
+                        gsap.to(carModel.rotation, {
+                            duration: 1.0,
+                            y: Math.PI * 0.4,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(carModel.position, {
+                            duration: 1.0,
+                            x: -0.5,
+                            y: -1.5,
+                            z: 0.5,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(camera.position, {
+                            duration: 1.0,
+                            x: 0,
+                            y: 0.5,
+                            z: 5.5,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                    },
+                    onEnterBack: () => {
+                        updateFeatureHighlight(featureTexts.two, "right");
+                    },
+                });
+
+                // --- Section Three ---
+                ScrollTrigger.create({
+                    trigger: "#three",
+                    start: "top center",
+                    end: "bottom center",
+                    // markers: true,
+                    onEnter: () => {
+                        gsap.to(carModel.rotation, {
+                            duration: 1.5,
+                            x: Math.PI * 0.05,
+                            y: Math.PI * 0.5,
+                            z: 0,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(carModel.position, {
+                            duration: 1.5,
+                            x: 0,
+                            y: -1.2,
+                            z: 0,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(camera.position, {
+                            duration: 1.5,
+                            x: 0,
+                            y: 3.5,
+                            z: 4.5,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        updateFeatureHighlight(featureTexts.three, "bottom");
+                    },
+                    onLeaveBack: () => {
+                        gsap.to(carModel.rotation, {
+                            duration: 1.0,
+                            x: 0,
+                            y: -Math.PI * 0.6,
+                            z: 0,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(carModel.position, {
+                            duration: 1.0,
+                            x: 0.8,
+                            y: -1.5,
+                            z: 0.2,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(camera.position, {
+                            duration: 1.0,
+                            x: 1.5,
+                            y: 0.8,
+                            z: 4.5,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                    },
+                    onEnterBack: () => {
+                        updateFeatureHighlight(featureTexts.three, "bottom");
+                    },
+                });
+
+                // --- Section Four ---
+                ScrollTrigger.create({
+                    trigger: "#four",
+                    start: "top center",
+                    end: "bottom center",
+                    // markers: true,
+                    onEnter: () => {
+                        gsap.to(carModel.rotation, {
+                            duration: 1.5,
+                            x: 0,
+                            y: Math.PI * 0.25,
+                            z: 0,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(carModel.position, {
+                            duration: 1.5,
+                            x: -1.0,
+                            y: -1.5,
+                            z: 1.0,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(camera.position, {
+                            duration: 1.5,
+                            x: -2.5,
+                            y: 0.2,
+                            z: 5.0,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        updateFeatureHighlight(featureTexts.four, "top-right");
+                    },
+                    onLeaveBack: () => {
+                        gsap.to(carModel.rotation, {
+                            duration: 1.0,
+                            x: Math.PI * 0.05,
+                            y: Math.PI * 0.5,
+                            z: 0,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(carModel.position, {
+                            duration: 1.0,
+                            x: 0,
+                            y: -1.2,
+                            z: 0,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                        gsap.to(camera.position, {
+                            duration: 1.0,
+                            x: 0,
+                            y: 3.5,
+                            z: 4.5,
+                            ease: "power2.inOut",
+                            overwrite: true,
+                        });
+                    },
+                    onEnterBack: () => {
+                        updateFeatureHighlight(featureTexts.four, "top-right");
+                    },
+                });
+            }
+
+            /**
+             * Updates the text content and positions the feature highlight box.
+             */
+            function updateFeatureHighlight(text, position = "center") {
+                if (!featureHighlightContainer || !currentHighlightElement)
+                    return;
+
+                currentHighlightElement.textContent = text;
+
+                featureHighlightContainer.style.top = "auto";
+                featureHighlightContainer.style.bottom = "auto";
+                featureHighlightContainer.style.left = "auto";
+                featureHighlightContainer.style.right = "auto";
+                featureHighlightContainer.style.transform =
+                    "translate(-50%, -50%)";
+
+                switch (position) {
+                    case "left":
+                        featureHighlightContainer.style.top = "50%";
+                        featureHighlightContainer.style.left = "5%";
+                        featureHighlightContainer.style.transform =
+                            "translateY(-50%)";
+                        break;
+                    case "right":
+                        featureHighlightContainer.style.top = "50%";
+                        featureHighlightContainer.style.right = "5%";
+                        featureHighlightContainer.style.transform =
+                            "translateY(-50%)";
+                        break;
+                    case "top-right":
+                        featureHighlightContainer.style.top = "15%";
+                        featureHighlightContainer.style.right = "5%";
+                        featureHighlightContainer.style.transform = "none";
+                        break;
+                    case "bottom":
+                        featureHighlightContainer.style.bottom = "10%";
+                        featureHighlightContainer.style.left = "50%";
+                        featureHighlightContainer.style.transform =
+                            "translateX(-50%)";
+                        break;
+                    case "center":
+                    default:
+                        featureHighlightContainer.style.top = "50%";
+                        featureHighlightContainer.style.left = "50%";
+                        featureHighlightContainer.style.transform =
+                            "translate(-50%, -50%)";
+                        break;
+                }
+
+                gsap.to(featureHighlightContainer, {
+                    opacity: 1,
+                    duration: 0.6,
+                    delay: 0.3,
+                    ease: "power1.out",
+                    overwrite: true,
+                });
+            }
+        </script>
+    </body>
+</html>

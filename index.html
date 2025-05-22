@@ -10,6 +10,16 @@
             href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
             rel="stylesheet"
         />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+            rel="stylesheet"
+        />
+
+        <link rel="stylesheet" href="src/style.css" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
@@ -22,281 +32,6 @@
                 }
             }
         </script>
-        <style>
-            /* Basic Reset & Body Styling */
-            html {
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                scrollbar-width: none; /* Firefox */
-                -ms-overflow-style: none; /* IE and Edge */
-                overflow-x: hidden;
-                font-family: "Anton", sans-serif;
-                overflow-y: scroll; /* Ensure vertical scroll is enabled */
-            }
-            html::-webkit-scrollbar {
-                display: none; /* Chrome, Safari, Opera */
-            }
-
-            body {
-                margin: 0;
-                padding: 0;
-                /* Body height will be determined by the total height of panels */
-                height: auto;
-                background-color: #000;
-                color: #fff;
-                overflow-x: hidden; /* Prevent horizontal scroll */
-            }
-
-            /* Video Container Styling */
-            .video-container {
-                display: block;
-                position: fixed; /* Fixed position to stay behind content */
-                top: 0;
-                left: 0;
-                height: 100vh;
-                width: 100%;
-                background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
-                z-index: 1; /* Behind content, above background */
-                overflow: hidden; /* Ensure video doesn't overflow */
-            }
-
-            #bg-video {
-                display: block;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%); /* Center the video */
-                min-width: 100%;
-                min-height: 100%;
-                width: auto;
-                height: auto;
-                object-fit: cover; /* Ensure video aspect ratio is maintained */
-            }
-
-            /* Three.js Canvas Container */
-            #app {
-                display: block;
-                position: fixed; /* Fixed position for the 3D scene */
-                width: 100%;
-                height: 100%;
-                top: 0;
-                left: 0;
-                pointer-events: none; /* Allow clicks to pass through initially */
-                z-index: 3; /* Above video and text panels */
-            }
-            #app canvas {
-                display: block; /* Prevent extra space below canvas */
-            }
-
-            /* Text Styling */
-            h1 {
-                font-size: 25vw; /* Slightly smaller for better fit */
-                color: #fff;
-                text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
-                margin: 0;
-                padding: 0;
-                font-family: "Anton", sans-serif;
-                font-weight: 900;
-                letter-spacing: -0.03em; /* Adjust spacing */
-                line-height: 0.9;
-                text-align: left;
-                width: 100%;
-            }
-
-            h2 {
-                font-size: 6vw;
-                color: #fff;
-                text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
-                margin: 0 0 2vh 0; /* Add some bottom margin */
-                padding: 0;
-                font-family: "Anton", sans-serif;
-                font-weight: 700;
-                letter-spacing: -0.02em;
-                text-align: center; /* Center section titles */
-                width: 80%; /* Limit width */
-            }
-
-            .highlight-text {
-                font-size: 2.5vw; /* Adjusted size */
-                color: #d10000; /* Porsche Red */
-                margin: 1vh 0 3vh 0; /* Adjusted margin */
-                max-width: 80%;
-                text-align: inherit; /* Inherit alignment from parent */
-                font-weight: normal; /* Use default weight */
-            }
-
-            /* Panel Container Styling */
-            .container {
-                position: relative; /* Needed for panel positioning */
-                height: auto; /* Height determined by content */
-                width: 100%;
-                z-index: 2; /* Above video, below 3D model */
-                padding: 0;
-                border: none;
-            }
-
-            /* Individual Section Panel Styling */
-            .panel {
-                height: 100vh; /* Each section is full viewport height */
-                width: 100%;
-                display: flex;
-                flex-direction: column;
-                align-items: center; /* Default center alignment */
-                justify-content: center; /* Default center alignment */
-                background-color: transparent; /* Allow video bg */
-                margin: 0;
-                padding: 5vw; /* Add some padding */
-                box-sizing: border-box; /* Include padding in height/width */
-                position: relative; /* Needed for absolute positioned children */
-                color: #fff; /* Ensure text is white */
-            }
-
-            /* Specific Panel Alignments */
-            #zero {
-                background-color: transparent;
-                height: 100vh; /* Keep initial panel full height for intro scroll */
-                justify-content: flex-end; /* Align content to the bottom */
-                padding-bottom: 10vh;
-                text-align: center;
-                font-size: 0.8em;
-                color: #555;
-            }
-
-            #one {
-                align-items: flex-start; /* Align text left */
-                justify-content: flex-start; /* Align text top */
-                padding-top: 15vh;
-                padding-left: 5vw;
-            }
-
-            #two,
-            #three,
-            #four {
-                align-items: center;
-                justify-content: center;
-                text-align: center; /* Center text within these panels */
-            }
-
-            /* Porsche brand color accents */
-            .accent-box {
-                position: absolute;
-                bottom: 20vh;
-                left: 5vw; /* Align with text padding */
-                width: 0; /* Initial width for animation */
-                height: 0.8vh; /* Slightly thicker */
-                background-color: #d10000; /* Porsche Red */
-            }
-            #two .accent-box,
-            #three .accent-box,
-            #four .accent-box {
-                left: 50%;
-                transform: translateX(-50%);
-                width: 0; /* Initial width for animation */
-            }
-            #two .accent-box,
-            #three .accent-box,
-            #four .accent-box {
-                bottom: 25vh; /* Adjust position for centered layout */
-            }
-
-            .section-number {
-                position: absolute;
-                top: 5vh;
-                right: 5vw;
-                font-size: 3vw;
-                opacity: 0; /* Start hidden */
-                color: rgba(
-                    255,
-                    255,
-                    255,
-                    0.6
-                ); /* Slightly transparent white */
-            }
-
-            /* Vignette effect */
-            .vignette {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                box-shadow: inset 0 0 150px rgba(0, 0, 0, 0.9);
-                pointer-events: none; /* Allow clicks through */
-                z-index: 4; /* Above 3D model */
-            }
-
-            /* Logo positioning */
-            .logo {
-                position: fixed;
-                top: 3vh;
-                left: 3vw;
-                width: auto; /* Adjust width automatically */
-                height: 4vh; /* Control size by height */
-                z-index: 10; /* Above everything */
-                opacity: 0.8;
-                pointer-events: none; /* Prevent interaction with logo */
-                color: #ffffff;
-                font-family: "Anton", sans-serif;
-                font-size: 3vh; /* Match height */
-                font-weight: bold;
-                text-transform: uppercase;
-                letter-spacing: 0.1em;
-            }
-
-            /* Navigation dots */
-            .nav-dots {
-                position: fixed;
-                right: 3vw;
-                top: 50%;
-                transform: translateY(-50%);
-                z-index: 11; /* Above everything */
-                display: flex;
-                flex-direction: column;
-                gap: 2vh;
-                /* Removed initial opacity here */
-                pointer-events: auto; /* Allow clicking dots */
-            }
-
-            .nav-dot {
-                width: 1vw;
-                height: 1vw;
-                min-width: 10px; /* Minimum size */
-                min-height: 10px;
-                border-radius: 50%;
-                background-color: rgb(255, 255, 255);
-                transition: all 0.3s ease;
-                cursor: pointer; /* Indicate clickable */
-            }
-
-            .active {
-                background-color: #d10000; /* Porsche Red */
-                transform: scale(1.3);
-            }
-
-            /* Feature highlight text (positioned via JS later) */
-            #feature-highlights {
-                position: fixed;
-                /* Positioning will be controlled by JS based on section */
-                color: white;
-                z-index: 5; /* Above vignette */
-                font-size: 2vw;
-                font-family: "Anton", sans-serif;
-                opacity: 0; /* Start hidden */
-                text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-                pointer-events: none;
-                background-color: rgba(0, 0, 0, 0.3); /* Subtle background */
-                padding: 1vw 2vw;
-                border-radius: 8px;
-                max-width: 40%; /* Limit width */
-                text-align: center;
-                transition: opacity 0.5s ease-in-out; /* Smooth fade */
-            }
-            #current-highlight {
-                margin: 0;
-                padding: 0;
-            }
-        </style>
     </head>
     <body>
         <div class="logo">PORSCHE</div>
@@ -309,9 +44,8 @@
             <div class="nav-dot" data-section="four"></div>
         </div>
 
-        <div class="vignette"></div>
-
         <section class="video-section">
+            <div class="vignette"></div>
             <div class="video-container">
                 <video autoplay muted loop playsinline id="bg-video">
                     <source
@@ -326,513 +60,191 @@
 
         <div id="app"></div>
 
-        <div id="feature-highlights">
-            <p id="current-highlight"></p>
-        </div>
-
         <div class="container">
             <section id="zero" class="panel">(Scroll Down to Begin)</section>
 
             <section id="one" class="panel">
                 <h1>GT3 RS</h1>
-                <div class="highlight-text">
-                    BORN ON THE TRACK, BUILT FOR THE ROAD
-                </div>
-                <div class="accent-box"></div>
                 <div class="section-number">01</div>
             </section>
 
             <section id="two" class="panel">
-                <h2>PURE RACING TECHNOLOGY</h2>
-                <div class="highlight-text">
-                    518 HP NATURALLY ASPIRATED ENGINE
+                <div class="stats-container">
+                    <div class="stat">
+                        <div class="value">
+                            <span class="counter" data-target="3.2">0</span
+                            ><span class="unit">s</span>
+                        </div>
+                        <div class="label">Acceleration 0 - 100 km/h</div>
+                    </div>
+                    <div class="stat">
+                        <div class="value">
+                            <span class="counter" data-target="386">0</span
+                            ><span class="unit">kW</span>
+                            <span class="divider">/</span>
+                            <span class="counter" data-target="525">0</span
+                            ><span class="unit">PS</span>
+                        </div>
+                        <div class="label">Power (kW)/Power (PS)</div>
+                    </div>
+                    <div class="stat">
+                        <div class="value">
+                            <span class="counter" data-target="296">0</span
+                            ><span class="unit">km/h</span>
+                        </div>
+                        <div class="label">Top speed</div>
+                    </div>
                 </div>
-                <div class="accent-box"></div>
                 <div class="section-number">02</div>
             </section>
 
             <section id="three" class="panel">
-                <h2>MASTERFUL DOWNFORCE</h2>
-                <div class="highlight-text">AERODYNAMIC PRECISION</div>
-                <div class="accent-box"></div>
                 <div class="section-number">03</div>
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <!-- slide 0 -->
+                        <div class="slide">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img
+                                        src="/pics/S22_3439_fine.jpg"
+                                        alt="Porsche 911 GT3 RS front view"
+                                    />
+                                </div>
+                                <div class="slide-text">
+                                    <h2>
+                                        High-revving naturally aspirated engine.
+                                    </h2>
+                                    <div class="description">
+                                        <p>
+                                            A well-rehearsed motorsports team:
+                                            the 4.0 l six-cylinder flat engine
+                                            with individual throttle valve
+                                            intake system in combination with
+                                            the lightweight stainless steel
+                                            sport exhaust system.
+                                        </p>
+                                    </div>
+                                    <button class="toggle-btn">
+                                        Show less
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 1 -->
+                        <div class="slide">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img
+                                        src="/pics/S22_3441_fine.jpg"
+                                        alt="Porsche 911 GT3 RS front view"
+                                    />
+                                </div>
+                                <div class="slide-text">
+                                    <h2>
+                                        Wide Turbo body with lateral air
+                                        intakes.
+                                    </h2>
+                                    <div class="description collapsed">
+                                        <p>
+                                            The wide Turbo body with lateral air
+                                            intakes significantly contributes to
+                                            the aerodynamic optimisation of the
+                                            911 GT3 RS – and reinforces its
+                                            athletic appearance. It also opens
+                                            up space for wider wheels that
+                                            improve handling even further.
+                                        </p>
+                                    </div>
+                                    <button class="toggle-btn">
+                                        Show less
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2 -->
+                        <div class="slide">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img
+                                        src="/pics/S22_3440_fine.jpg"
+                                        alt="Porsche 911 GT3 RS side view"
+                                    />
+                                </div>
+                                <div class="slide-text">
+                                    <h2>Porsche Active Aerodynamics (PAA).</h2>
+                                    <div class="description collapsed">
+                                        <p>
+                                            For higher cornering speeds, the
+                                            front diffuser and rear wing are
+                                            adjusted entirely automatically to
+                                            the driving situation in just
+                                            fractions of a second. The Drag
+                                            Reduction System (DRS) provides the
+                                            best conditions for the next flying
+                                            lap by reducing drag on the
+                                            straight.
+                                        </p>
+                                    </div>
+                                    <button class="toggle-btn">
+                                        Show more
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3 -->
+                        <div class="slide">
+                            <div class="slide-content">
+                                <div class="slide-image">
+                                    <img
+                                        src="/pics/S22_3437_fine.jpg"
+                                        alt="Porsche 911 GT3 RS rear view"
+                                    />
+                                </div>
+                                <div class="slide-text">
+                                    <h2>Form follows air flow.</h2>
+                                    <div class="description collapsed">
+                                        <p>
+                                            Headwind is one of the biggest
+                                            challenges on the way to fast lap
+                                            times. The 911 GT3 RS uses air flow
+                                            optimally with every component. The
+                                            setup for the best possible drag
+                                            coefficient is completed by a
+                                            two-piece rear section with enlarged
+                                            air vents, rear spoiler with rear
+                                            ventilation and a diffuser.
+                                        </p>
+                                    </div>
+                                    <button class="toggle-btn">
+                                        Show more
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Arrows -->
+                    <button class="arrow prev">&#10094;</button>
+                    <button class="arrow next">&#10095;</button>
+
+                    <!-- Pagination Dots -->
+                    <div class="pagination">
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                </div>
             </section>
             <section id="four" class="panel">
-                <h2>PERFECTLY CALIBRATED</h2>
-                <div class="highlight-text">TRACK-READY PERFORMANCE</div>
-                <div class="accent-box"></div>
                 <div class="section-number">04</div>
             </section>
         </div>
 
-        <script type="module">
-            // Import necessary Three.js components
-            import * as THREE from "three";
-            // OrbitControls are useful for debugging the 3D scene, but will be disabled for the final scroll animation
-            import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-            import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-            import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
-
-            // === GSAP & ScrollTrigger Setup ===
-            // Register GSAP plugins
-            gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-
-            // --- Global Variables (for Three.js) ---
-            let camera,
-                scene,
-                renderer,
-                controls, // OrbitControls instance (will be disabled for scroll animation)
-                carModel, // Loaded GLTF model
-                lights, // Object containing scene lights
-                featureHighlightContainer, // DOM element for feature text box
-                currentHighlightElement; // DOM element for the text inside the box
-
-            // Text content for each section's highlight feature (for later steps)
-            const featureTexts = {
-                one: "GT3 RS: Track DNA",
-                two: "Engine: 518 HP Naturally Aspirated",
-                three: "Aero: Active Downforce System",
-                four: "Performance: Nürburgring Tuned",
-            };
-
-            // --- Initialization ---
-            document.addEventListener("DOMContentLoaded", () => {
-                // Setup navigation dots functionality
-                setupNavDots();
-                // Animate in the initial static elements (logo, nav dots)
-                animateIntro();
-                // Setup scroll-triggered animations for text elements in each section
-                setupSectionTextAnimations();
-                // Setup the background video reveal animation (will be added back later)
-                // setupBackgroundVideoReveal();
-
-                // --- Step 7: Initialize Three.js Scene ---
-                initThreeJS();
-
-                // --- Step 8: Load 3D Model and Environment ---
-                loadEnvironment("hdr/modern_buildings_4k.hdr"); // Replace with your HDR path
-                loadCarModel("porsche_gt3_rs.glb"); // Replace with your GLB path
-
-                // Setup GSAP Snap Scrolling
-                setupSnapScrolling();
-
-                // Optional: Fade video slightly on deep scroll for effect (can be added later)
-                ScrollTrigger.create({
-                    trigger: "body",
-                    start: "top top",
-                    end: "bottom bottom",
-                    scrub: 0.5,
-                    onUpdate: (self) => {
-                        gsap.to(".video-container", {
-                            opacity: 1 - self.progress * 0.4, // Fade to 60% opacity
-                            ease: "none",
-                            overwrite: "auto",
-                        });
-                    },
-                });
-
-                // Add resize listener for Three.js
-                window.addEventListener("resize", onWindowResize);
-
-                // Start the animation loop
-                animate();
-            });
-
-            // --- GSAP Animation Setup Functions ---
-
-            /**
-             * Sets up GSAP ScrollTrigger for snap-to-section scrolling.
-             */
-            function setupSnapScrolling() {
-                const panels = gsap.utils.toArray(".panel"); // Get all panels including #zero
-                const numPanels = panels.length;
-
-                ScrollTrigger.create({
-                    trigger: "body", // Trigger on the body for overall page scroll
-                    start: "top top", // Start the snapping effect from the top of the page
-                    end: "bottom bottom", // End the snapping effect at the bottom of the page
-                    // markers: true, // Uncomment for debugging
-                    snap: {
-                        // Snap to equally spaced points based on the number of panels
-                        snapTo: [0, 0.25, 0.5, 0.75, 1], // Explicit snap points for 5 panels (0, 1/4, 1/2, 3/4, 1)
-                        duration: { min: 0.5, max: 0.8 }, // Smoothness of the snap
-                        ease: "power2.inOut", // Easing for the snap animation
-                    },
-                    // Optional: Add a small tolerance to make snapping less aggressive
-                    // tolerance: 0.1,
-                });
-            }
-
-            /**
-             * Sets up click events for navigation dots and updates active dot based on scroll.
-             */
-            function setupNavDots() {
-                const navDots = document.querySelectorAll(".nav-dot");
-                const sections = document.querySelectorAll(".panel"); // Get all panels
-
-                // Create ScrollTriggers for each section to update the active dot
-                sections.forEach((section, index) => {
-                    ScrollTrigger.create({
-                        trigger: section,
-                        start: "top center+=10%", // Trigger slightly past the center when scrolling down
-                        end: "bottom center-=10%", // End trigger slightly before center when scrolling down
-                        // markers: true, // Uncomment for debugging dot triggers
-                        onEnter: () => setActiveDot(section.id), // Update dot when entering section view
-                        onEnterBack: () => setActiveDot(section.id), // Update dot when scrolling back into section view
-                    });
-                });
-
-                // Add click event to navigation dots for smooth scrolling
-                navDots.forEach((dot) => {
-                    dot.addEventListener("click", () => {
-                        const targetSectionId =
-                            dot.getAttribute("data-section");
-                        const targetSection =
-                            document.getElementById(targetSectionId);
-                        if (targetSection) {
-                            // Use GSAP's ScrollToPlugin for smooth scrolling
-                            gsap.to(window, {
-                                scrollTo: {
-                                    y: targetSection, // Target element to scroll to
-                                    offsetY: 1, // Small offset to ensure trigger fires correctly
-                                },
-                                duration: 1.2, // Duration of the scroll animation
-                                ease: "power2.inOut", // Easing function
-                            });
-                        }
-                    });
-                });
-            }
-
-            /**
-             * Updates the visual state of navigation dots.
-             * @param {string} sectionId - The ID of the currently active section.
-             */
-            function setActiveDot(sectionId) {
-                document.querySelectorAll(".nav-dot").forEach((dot) => {
-                    if (dot.getAttribute("data-section") === sectionId) {
-                        dot.classList.add("active");
-                    } else {
-                        dot.classList.remove("active");
-                    }
-                });
-            }
-
-            /**
-             * Creates the initial fade-in/pop-in animation for static UI elements.
-             */
-            function animateIntro() {
-                const tl = gsap.timeline({ delay: 0.5 }); // Add a small delay for smoother start
-
-                // Animate logo fade-in from top
-                tl.from(".logo", {
-                    y: -50,
-                    opacity: 0,
-                    duration: 1,
-                    ease: "power3.out",
-                });
-
-                // Animate navigation dots scaling in with a stagger effect
-                tl.from(
-                    ".nav-dots", // Corrected target to individual dots
-                    {
-                        scale: 0,
-                        opacity: 0,
-                        duration: 0.5,
-                        stagger: 0.1, // Animate dots one after another
-                        ease: "back.out(1.7)", // Add a slight overshoot effect
-                    },
-                    "-=0.5" // Overlap start slightly with logo animation
-                );
-            }
-
-            /**
-             * Sets up scroll-triggered animations for text elements within each content panel.
-             */
-            function setupSectionTextAnimations() {
-                // Select all panels except the initial empty one (#zero)
-                document
-                    .querySelectorAll(".panel:not(#zero)")
-                    .forEach((section) => {
-                        // Find elements within the section to animate
-                        const elementsToAnimate = section.querySelectorAll(
-                            "h1, h2, .highlight-text"
-                        );
-                        const accentBox = section.querySelector(".accent-box");
-                        const sectionNumber =
-                            section.querySelector(".section-number");
-                        const targetAccentWidth =
-                            section.id === "one" ? "40vw" : "30vw";
-
-                        const tl = gsap.timeline({
-                            scrollTrigger: {
-                                trigger: section,
-                                start: "top center+=20%",
-                                toggleActions: "play none none reverse",
-                                // markers: true,
-                            },
-                        });
-
-                        tl.from(elementsToAnimate, {
-                            y: 50,
-                            opacity: 0,
-                            duration: 0.8,
-                            ease: "power3.out",
-                            stagger: 0.15,
-                        });
-
-                        if (accentBox) {
-                            tl.fromTo(
-                                accentBox,
-                                { width: 0 },
-                                {
-                                    width: targetAccentWidth,
-                                    duration: 1,
-                                    ease: "power3.inOut",
-                                },
-                                "-=0.5"
-                            );
-                        }
-
-                        if (sectionNumber) {
-                            gsap.fromTo(
-                                sectionNumber,
-                                { opacity: 0, y: -20 },
-                                {
-                                    opacity: 0.6,
-                                    y: 0,
-                                    duration: 0.8,
-                                    ease: "power3.out",
-                                    scrollTrigger: {
-                                        trigger: section,
-                                        start: "top center+=20%",
-                                        toggleActions: "play none none reverse",
-                                    },
-                                }
-                            );
-                        }
-                    });
-            }
-
-            /**
-             * Sets up the initial background video reveal.
-             * (Implementation for later steps)
-             */
-            function setupBackgroundVideoReveal() {
-                // ... (code for video reveal)
-            }
-
-            // --- Three.js Setup Functions ---
-
-            /**
-             * Initializes the Three.js scene, camera, renderer, loads assets, and sets up controls.
-             */
-            function initThreeJS() {
-                // Get the container for the Three.js scene
-                const container = document.getElementById("app");
-
-                // 1. Create Scene
-                scene = new THREE.Scene();
-                scene.background = null; // Set background to null to see HTML elements behind it
-
-                // 2. Create Camera
-                // PerspectiveCamera( fov, aspect, near, far )
-                camera = new THREE.PerspectiveCamera(
-                    40, // Field of view (vertical)
-                    window.innerWidth / window.innerHeight, // Aspect ratio
-                    0.1, // Near clipping plane
-                    1000 // Far clipping plane
-                );
-                camera.position.set(0, 2, 5); // Initial camera position (x, y, z)
-
-                // 3. Create Renderer
-                renderer = new THREE.WebGLRenderer({
-                    antialias: true, // Smooth edges
-                    alpha: true, // Enable transparency for scene background
-                });
-                renderer.setSize(window.innerWidth, window.innerHeight); // Set renderer size to window dimensions
-                renderer.setPixelRatio(window.devicePixelRatio); // Use device pixel ratio for sharpness
-                renderer.shadowMap.enabled = true; // Enable shadow maps
-                renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Soft shadows
-
-                // Append the renderer's canvas to the #app container
-                container.appendChild(renderer.domElement);
-
-                // 4. Add Basic Lighting (will be replaced by environment map lighting)
-                lights = createLighting(); // Call the function to create and add lights
-                // scene.add(lights.ambientLight, lights.directionalLight); // Commented out, environment map will provide lighting
-
-                console.log(
-                    "Three.js scene initialized with basic components."
-                );
-            }
-
-            /**
-             * Creates and configures the lights for the scene.
-             * (Basic lighting, will be less important once environment map is loaded)
-             */
-            const createLighting = () => {
-                // Ambient light (soft light from all directions)
-                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Color, Intensity
-
-                // Directional light (like sunlight)
-                const directionalLight = new THREE.DirectionalLight(
-                    0xffffff,
-                    0.8
-                ); // Color, Intensity
-                directionalLight.position.set(5, 10, 7.5); // Position the light
-                directionalLight.castShadow = true; // Enable shadows for this light
-
-                // Configure shadow properties for the directional light
-                directionalLight.shadow.mapSize.width = 1024; // Shadow map resolution
-                directionalLight.shadow.mapSize.height = 1024;
-                directionalLight.shadow.camera.near = 0.5; // Near plane for shadow camera
-                directionalLight.shadow.camera.far = 50; // Far plane for shadow camera
-                directionalLight.shadow.camera.left = -10; // Shadow camera bounds
-                directionalLight.shadow.camera.right = 10;
-                directionalLight.shadow.camera.top = 10;
-                directionalLight.shadow.camera.bottom = -10;
-
-                return { ambientLight, directionalLight };
-            };
-
-            /**
-             * Loads the HDR environment map and applies it to the scene.
-             * @param {string} hdrPath - Path to the HDR file.
-             */
-            function loadEnvironment(hdrPath) {
-                const pmremGenerator = new THREE.PMREMGenerator(renderer);
-                pmremGenerator.compileEquirectangularShader();
-
-                new RGBELoader()
-                    .setPath("") // Assuming HDR is in the same directory as the HTML
-                    .load(
-                        hdrPath,
-                        function (texture) {
-                            const envMap =
-                                pmremGenerator.fromEquirectangular(
-                                    texture
-                                ).texture;
-
-                            // Apply environment map to the scene for reflections and lighting
-                            scene.environment = envMap;
-                            // scene.background = envMap; // Optional: set background to environment map
-
-                            texture.dispose();
-                            pmremGenerator.dispose();
-
-                            console.log(
-                                "HDR environment map loaded and applied."
-                            );
-                        },
-                        undefined,
-                        function (error) {
-                            console.error(
-                                "An error occurred loading the HDR environment map:",
-                                error
-                            );
-                            // Fallback or error handling
-                        }
-                    );
-            }
-
-            /**
-             * Loads the GLTF car model and adds it to the scene.
-             * @param {string} modelPath - Path to the GLB/GLTF model file.
-             */
-            function loadCarModel(modelPath) {
-                const loader = new GLTFLoader();
-
-                loader.load(
-                    modelPath,
-                    function (gltf) {
-                        carModel = gltf.scene;
-
-                        // Adjust position and scale if necessary
-                        carModel.position.set(0, -1, 0); // Example: move down slightly
-                        carModel.scale.set(1, 1, 1); // Example: set scale
-
-                        // Traverse the model to enable shadows on all meshes
-                        carModel.traverse((node) => {
-                            if (node.isMesh) {
-                                node.castShadow = true;
-                                node.receiveShadow = true; // Allow model to receive shadows
-                            }
-                        });
-
-                        scene.add(carModel); // Add the loaded model to the scene
-
-                        console.log("Car model loaded and added to the scene.");
-
-                        // Now that the model is loaded, we can set up scroll animations
-                        // setupScrollAnimations(); // Will be implemented in the next step
-                    },
-                    undefined,
-                    function (error) {
-                        console.error(
-                            "An error occurred loading the car model:",
-                            error
-                        );
-                        // Fallback or error handling
-                    }
-                );
-            }
-
-            /**
-             * Handles window resize events.
-             */
-            function onWindowResize() {
-                if (camera && renderer) {
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                }
-            }
-
-            /**
-             * The main animation loop.
-             */
-            function animate() {
-                requestAnimationFrame(animate); // Request the next frame
-
-                // Update controls if enabled (for debugging)
-                // if (controls) {
-                //     controls.update();
-                // }
-
-                // Render the scene with the camera
-                if (renderer && scene && camera) {
-                    renderer.render(scene, camera);
-                }
-            }
-
-            // --- Scroll-Based 3D Animations (for later steps) ---
-
-            /**
-             * Sets up GSAP ScrollTriggers for 3D model and camera animations.
-             * (Implementation for later steps)
-             */
-            function setupScrollAnimations() {
-                // This function will be implemented in Step 9
-                // It will use ScrollTrigger to animate carModel.position, carModel.rotation, and camera.position
-                // based on the scroll progress through the panels.
-                console.log(
-                    "setupScrollAnimations will be implemented in the next step."
-                );
-            }
-
-            /**
-             * Updates the text content and positions the feature highlight box.
-             * (Implementation for later steps)
-             */
-            function updateFeatureHighlight(text, position = "center") {
-                // This function will be implemented in Step 10
-                // It will update the #feature-highlights text and position it
-                // based on the active section and potentially the car's position.
-                console.log(
-                    "updateFeatureHighlight will be implemented in a later step."
-                );
-            }
-        </script>
+        <script type="module" src="src/clindex.js"></script>
+        <script src="src/carousel.js"></script>
     </body>
 </html>

@@ -94,20 +94,40 @@ let scrollProgress = 0;
 let currentSection = null;
 let previousSection = null;
 
-// gsap.to(".paralax1", {
-//     scrollTrigger: {
-//         trigger: ".paralax1",
-//         toggleActions: "play none none reverse",
-//         start: "top top",
-//         end: "bottom top",
-//         scrub: 1,
-//         pin: true,
-//         anticipatePin: 1,
-//         markers: true,
-//     },
-//     duration: 3,
-//     x: 100,
-// });
+let sections = gsap.utils.toArray(".panel");
+
+const vh = [10, 100, 100, 100, 100]; // Heights of each section
+const total = vh.reduce((sum, h) => sum + h, 0);
+
+const snapPoints = [];
+let accumulated = 0;
+
+vh.forEach((h) => {
+    snapPoints.push(accumulated / total);
+    accumulated += h;
+});
+
+// snapPoints now contains: [0, 0.0244, 0.268, 0.512, 0.756, 1]
+snapPoints.push(1); // Ensure final snap at 1 if needed
+
+gsap.to(sections, {
+    yPercent: -100 * (sections.length - 1),
+    ease: "none",
+    scrollTrigger: {
+        trigger: ".container",
+        pin: true,
+        scrub: true,
+        delay: 0.05,
+        snap: {
+            snapTo: 1 / (sections.length - 1),
+            duration: { min: 0.3, max: 1 },
+            inertia: false,
+            ease: "power1.inOut",
+        },
+        end: () =>
+            "+=" + document.querySelector(".container").offsetHeight + "0",
+    },
+});
 
 window.addEventListener("scroll", () => {
     const maxScroll = document.body.scrollHeight - window.innerHeight;
@@ -120,12 +140,13 @@ window.addEventListener("scroll", () => {
 
     if (carModel) {
         console.log(carModel.position);
-        const sections = document.querySelectorAll(".paralax");
+        const sections = document.querySelectorAll(".scroll-section");
         let foundSection = null;
         sections.forEach((section) => {
             const rect = section.getBoundingClientRect();
             if (rect.top <= window.innerHeight / 3) {
                 foundSection = section.id;
+                console.log(foundSection);
             }
         });
 

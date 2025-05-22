@@ -3,370 +3,292 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>PORSCHE 911 GT3 RS</title>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-                font-family: "Arial", sans-serif;
-            }
-
-            body {
-                background-color: #000;
-                color: #fff;
-                overflow-x: hidden;
-            }
-
-            section {
-                position: relative;
-                height: 100vh;
-                width: 100%;
-                overflow: hidden;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .hero {
-                position: relative;
-                background: url("/api/placeholder/1920/1080") no-repeat center
-                    center;
-                background-size: cover;
-            }
-
-            .hero::after {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.7);
-                z-index: 1;
-            }
-
-            .text-container {
-                position: relative;
-                z-index: 2;
-                text-align: center;
-                max-width: 100%;
-            }
-
-            .big-text {
-                font-size: 18vw;
-                font-weight: 900;
-                line-height: 0.9;
-                letter-spacing: -5px;
-                text-align: center;
-                position: relative;
-                width: 100%;
-                background-clip: text;
-                -webkit-background-clip: text;
-                color: transparent;
-                overflow: hidden;
-            }
-
-            /* ADD THIS NEW STYLE */
-            .big-text video {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                z-index: -1;
-                background: white;
-            }
-
-            .video-mask {
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                z-index: -1;
-            }
-
-            .model-section {
-                background-color: #111;
-            }
-
-            .model-title {
-                font-size: 6vw;
-                font-weight: 700;
-                margin-bottom: 30px;
-                transform: translateY(50px);
-                opacity: 0;
-            }
-
-            .model-container {
-                width: 100%;
-                height: 60vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .placeholder-3d {
-                width: 80%;
-                height: 100%;
-                background: url("/api/placeholder/800/600") no-repeat center
-                    center;
-                background-size: contain;
-                transform: translateY(50px);
-                opacity: 0;
-            }
-
-            .specs-section {
-                height: 200vh;
-                display: block;
-                position: relative;
-                padding-top: 20vh;
-            }
-
-            .specs-bg {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100vh;
-                background: url("/api/placeholder/1920/1080") no-repeat center
-                    center;
-                background-size: cover;
-                z-index: -1;
-            }
-
-            .specs-bg::after {
-                content: "";
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0, 0, 0, 0.8);
-            }
-
-            .specs-item {
-                width: 100%;
-                padding: 10vh 10%;
-                opacity: 0;
-                position: relative;
-            }
-
-            .specs-item:nth-child(odd) {
-                text-align: left;
-                transform: translateX(-100px);
-            }
-
-            .specs-item:nth-child(even) {
-                text-align: right;
-                transform: translateX(100px);
-            }
-
-            .specs-title {
-                font-size: 3rem;
-                font-weight: 700;
-                margin-bottom: 20px;
-                color: #d5001c;
-            }
-
-            .specs-desc {
-                font-size: 1.5rem;
-                line-height: 1.6;
-                max-width: 600px;
-                margin: 0 auto;
-            }
-
-            .specs-item:nth-child(odd) .specs-desc {
-                margin-left: 0;
-            }
-
-            .specs-item:nth-child(even) .specs-desc {
-                margin-right: 0;
-            }
-
-            footer {
-                background-color: #111;
-                padding: 50px 0;
-                text-align: center;
-            }
-
-            .footer-logo {
-                font-size: 2rem;
-                font-weight: 700;
-                margin-bottom: 20px;
-            }
-
-            .footer-links {
-                display: flex;
-                justify-content: center;
-                gap: 30px;
-                margin: 30px 0;
-            }
-
-            .footer-links a {
-                color: #fff;
-                text-decoration: none;
-                transition: color 0.3s ease;
-            }
-
-            .footer-links a:hover {
-                color: #d5001c;
-            }
-
-            .copyright {
-                margin-top: 30px;
-                font-size: 0.9rem;
-                color: #888;
-            }
-        </style>
+        <title>Porsche Video Text</title>
+        <link rel="stylesheet" href="style.css" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Anton&display=swap"
+            rel="stylesheet"
+        />
     </head>
+    <style>
+        /* Basic Reset & Body Styling */
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            scrollbar-width: none;
+            overflow-x: hidden;
+            font-family: "Anton", sans-serif;
+            /* overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth; */
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 250vh;
+        }
+        svg {
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+        /* Video Container Styling */
+        .video-container {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            z-index: 1;
+            scroll-snap-align: center;
+        }
+
+        #bg-video {
+            display: block;
+            width: 100%;
+            clip-path: url(#clip-00);
+        }
+
+        .clipping-paths {
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+        #app {
+            display: block;
+            position: fixed;
+            width: 50%;
+            height: 100%;
+            inset: 0;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 3;
+        }
+        h1 {
+            font-size: 27vw; /* Large text size */
+            color: black;
+            /* text-align: left; */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin: 0;
+            padding: 0;
+            font-family: Impact, Haettenschweiler, "Arial Narrow Bold",
+                sans-serif;
+            font-weight: 900;
+        }
+        .container {
+            position: absolute;
+            top: 50vh;
+            height: 100vh;
+            width: 100%;
+            z-index: 2;
+            overflow: hidden; /* Add this */
+            padding: 0; /* Add this */
+            border: none; /* Add this */
+        }
+        #zero {
+            background-color: #00000000;
+        }
+        /* .panel:nth-child(1) {
+            background-color: #ff6347;
+        }
+        .panel:nth-child(2) {
+            background-color: #47ffff;
+        }
+        .panel:nth-child(3) {
+            background-color: #32cd32;
+        .panel:nth-child(4) {
+            background-color: #ffa500;
+        } */
+        .panel {
+            height: 100vh;
+            display: flex;
+            align-items: top;
+            justify-content: center;
+            background-color: #171717;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
     <body>
-        <section class="hero">
-            <div class="text-container">
-                <h1 class="big-text">
-                    PORSCHE
-                    <video class="video-mask" autoplay loop muted playsinline>
-                        <source src="./PV18_0001.mp4" type="video/mp4" />
-                    </video>
-                </h1>
+        <section>
+            <svg class="clipping-paths">
+                <defs>
+                    <clipPath
+                        id="clip-00"
+                        clipPathUnits="objectBoundingBox"
+                        transform="scale(0.0005208333333333333, 0.000925925925925926)"
+                    >
+                        <path
+                            id="porsche"
+                            d="M 18.841207,236.34251
+                    H 128.39531
+                    q 44.44176,0 68.21293,6.97632 24.02956,6.97632 35.91515,20.15382 12.14396,13.1775 16.27808,32.03941 4.3925,18.60353 4.3925,57.87764
+                    v 36.43191
+                    q 0,40.04926 -8.26823,58.3944 -8.26824,18.34514 -30.48912,28.16367 -21.96249,9.81853 -57.61925,9.81853
+                    H 127.62016
+                    V 654.66348
+                    H 18.841207
+                    Z
+                    
+                    m 108.778953,71.5719
+                    v 106.45352
+                    q 4.65089,0.25838 8.00986,0.25838 14.98617,0 20.67058,-7.23471 5.94279,-7.49308 5.94279,-30.74749
+                    v -34.36485
+                    q 0,-21.44573 -6.71794,-27.90529 -6.71794,-6.45956 -27.90529,-6.45956
+                    z
+                    
+                    m 405.40187,173.37454
+                    q 0,63.04528 -3.10058,89.40028 -2.84221,26.09661 -18.60353,47.80073 -15.50294,21.70411 -42.11632,33.33132 -26.61338,11.6272 -62.01176,11.6272 -33.5897,0 -60.46146,-10.85205 -26.61338,-11.11044 -42.89146,-33.07294 -16.27809,-21.9625 -19.37868,-47.80073 -3.10059,-25.83823 -3.10059,-90.43381
+                    v -71.57191
+                    q 0,-63.04528 2.84221,-89.1419 3.10059,-26.35499 18.60353,-48.05911 15.76132,-21.70411 42.3747,-33.33132 26.61338,-11.6272 62.01175,-11.6272 33.58971,0 60.20308,11.11044 26.87177,10.85206 43.14985,32.81455 16.27809,21.9625 19.37868,47.80073 3.10058,25.83823 3.10058,90.43381
+                    z
+                    
+                    M 424.24308,343.82955
+                    q 0,-29.1972 -3.35897,-37.20705 -3.10059,-8.26824 -13.1775,-8.26824 -8.52662,0 -13.1775,6.71794 -4.3925,6.45956 -4.3925,38.75735
+                    v 195.33704
+                    q 0,36.4319 2.84221,44.95852 3.10058,8.52662 13.95264,8.52662 11.11044,0 14.21103,-9.81853 3.10059,-9.81853 3.10059,-46.7672
+                    z
+                    
+                    M 573.58803,236.34251
+                    h 76.99793
+                    q 76.99794,0 104.12808,5.94279 27.38853,5.94279 44.44176,30.48911 17.31161,24.28794 17.31161,77.77308 0,48.83426 -12.14396,65.62911 -12.14397,16.79485 -47.80073,20.15382 32.29779,8.00986 43.40823,21.44574 11.11044,13.43588 13.69426,24.8047 2.8422,11.11044 2.8422,61.75337
+                    V 654.66348
+                    H 715.43993
+                    V 515.6538
+                    q 0,-33.58971 -5.42603,-41.59956 -5.16765,-8.00985 -27.64691,-8.00985
+                    V 654.66348
+                    H 573.58803
+                    Z
+                    
+                    m 108.77896,71.5719
+                    v 93.01764
+                    q 18.34514,0 25.57985,-4.90927 7.49309,-5.16765 7.49309,-32.81455
+                    V 340.2122
+                    q 0,-19.89544 -7.23471,-26.09661 -6.97632,-6.20118 -25.83823,-6.20118
+                    z
+                    
+                    m 406.69381,55.03543
+                    H 988.0333
+                    v -31.00587
+                    q 0,-21.70412 -3.87573,-27.64691 -3.87574,-5.9428 -12.91912,-5.9428 -9.81853,0 -14.98617,8.00986 -4.90927,8.00985 -4.90927,24.28793 0,20.92897 5.68441,31.52265 5.42603,10.59367 30.7475,25.57985 72.60548,43.14984 91.46738,70.79675 18.8619,27.64691 18.8619,89.1419 0,44.70014 -10.5937,65.8875 -10.3353,21.18735 -40.3076,35.65676 -29.9724,14.21102 -69.76327,14.21102 -43.66661,0 -74.67249,-16.53647 -30.7475,-16.53646 -40.30764,-42.11631 -9.56015,-25.57985 -9.56015,-72.60544
+                    v -27.38852
+                    h 101.02749
+                    v 50.90132
+                    q 0,23.51279 4.13411,30.23073 4.3925,6.71794 15.24456,6.71794 10.85206,0 16.0197,-8.52662 5.42603,-8.52662 5.42603,-25.32147 0,-36.94867 -10.07691,-48.31749 -10.33529,-11.36882 -50.90131,-37.9822 -40.56603,-26.87176 -53.74353,-39.01573 -13.1775,-12.14397 -21.96249,-33.5897 -8.52662,-21.44574 -8.52662,-54.77706 0,-48.05911 12.14397,-70.27999 12.40235,-22.22088 39.79088,-34.62323 27.38852,-12.66073 66.14587,-12.66073 42.3747,0 72.0887,13.69426 29.9723,13.69426 39.5325,34.62323 9.8185,20.67059 9.8185,70.53838
+                    z
+                    
+                    m 297.1396,55.81059
+                    h -108.7789
+                    v -72.86382
+                    q 0,-31.78102 -3.6174,-39.53249 -3.359,-8.00986 -15.2446,-8.00986 -13.4358,0 -17.0532,9.56015 -3.6173,9.56015 -3.6173,41.34117
+                    v 194.30351
+                    q 0,30.48911 3.6173,39.79087 3.6174,9.30177 16.2781,9.30177 12.144,0 15.7613,-9.30177 3.8758,-9.30176 3.8758,-43.66661
+                    v -52.45161
+                    h 108.7789
+                    v 16.27809
+                    q 0,64.85396 -9.3018,91.9841 -9.0433,27.13015 -40.566,47.54235 -31.2642,20.4122 -77.2563,20.4122 -47.8007,0 -78.8066,-17.31161 -31.0059,-17.31162 -41.0828,-47.80073 -10.0769,-30.7475 -10.0769,-92.24249
+                    V 383.87881
+                    q 0,-45.2169 3.1006,-67.69617 3.1006,-22.73764 18.3451,-43.66661 15.503,-20.92897 42.6331,-32.81455 27.3885,-12.14397 62.7869,-12.14397 48.0591,0 79.3234,18.60353 31.2643,18.60352 41.0828,46.50881 9.8185,27.64691 9.8185,86.2997
+                    z
+                    
+                    m 289.1299,-182.41792
+                    v 418.32097
+                    h -108.779
+                    V 478.96351
+                    h -32.5561
+                    v 175.69997
+                    h -108.779
+                    V 236.34251
+                    h 108.779
+                    v 149.60336
+                    h 32.5561
+                    V 236.34251
+                    Z
+                    
+                    m 43.6667,0
+                    h 181.3844
+                    v 83.71587
+                    h -72.6055
+                    v 79.32337
+                    h 67.9546
+                    v 79.58176
+                    h -67.9546
+                    v 91.9841
+                    h 79.8402
+                    v 83.71587
+                    H 1718.997
+                    Z"
+                        />
+                        <path
+                            id="p911"
+                            d="m 610.45523,553.9359
+                    h 123.85283
+                    q 0,34.64201 0.9197,43.839 0.9197,8.89042 7.35759,15.02175 6.74447,6.13133 18.08742,6.13133 9.50356,0 15.63489,-5.82476 6.13133,-5.82476 6.74446,-15.02175 0.9197,-9.197 0.9197,-37.09454
+                    v -79.09414
+                    q -9.19699,19.92682 -27.59098,30.04351 -18.39398,9.81013 -45.67839,9.81013 -34.02888,0 -60.08702,-18.39399 -26.05815,-18.39398 -33.10917,-44.14556 -7.05103,-25.75158 -7.05103,-69.59058
+                    v -39.54707
+                    q 0,-52.11629 3.98536,-77.5613 4.29193,-25.44501 21.45965,-46.90466 17.16772,-21.76622 47.5178,-33.72231 30.35007,-11.95609 70.51027,-11.95609 49.66376,0 81.54667,13.79549 31.88291,13.79549 49.35719,39.85364 17.47429,25.75157 20.23339,54.26225 2.75909,28.51068 2.75909,110.36391
+                    v 68.97744
+                    q 0,88.5977 -2.45253,118.64121 -2.45253,29.73694 -21.45965,56.40822 -18.70055,26.67128 -50.89002,40.1602 -32.18948,13.18236 -74.49564,13.18236 -52.42286,0 -85.8386,-16.86116
+                    Q 639.57904,661.84728 624.86385,631.19064 610.45523,600.534 610.45523,553.9359
+                    Z
+                    
+                    M 734.30806,399.11986
+                    q 0,31.26977 7.97073,38.62737 8.27729,7.35759 16.86115,7.35759 12.87579,0 18.70055,-9.19699 6.13133,-9.50356 6.13133,-36.78797
+                    V 309.2959
+                    q 0,-32.80261 -5.82476,-42.9193 -5.5182,-10.11669 -18.70055,-10.11669 -7.97073,0 -16.55459,7.97073 -8.58386,7.66416 -8.58386,41.9996
+                    z
+                    
+                    M 1141.4283,189.42843
+                    V 685.75946
+                    H 1017.5754
+                    V 419.65981
+                    q 0,-57.63449 -2.7591,-69.28401 -2.7591,-11.64952 -15.3283,-17.47429 -12.26265,-6.13132 -55.18195,-6.13132
+                    h -12.26266
+                    v -57.94106
+                    q 89.82401,-19.31368 136.42201,-79.4007
+                    z
+                    
+                    m 239.1217,0
+                    V 685.75946
+                    H 1256.6972
+                    V 419.65981
+                    q 0,-57.63449 -2.7591,-69.28401 -2.7591,-11.64952 -15.3283,-17.47429 -12.2627,-6.13132 -55.182,-6.13132
+                    h -12.2626
+                    v -57.94106
+                    q 89.8239,-19.31368 136.422,-79.4007
+                    z"
+                        />
+                        <!-- path 1 -->
+                        <!-- path 2 -->
+                    </clipPath>
+                </defs>
+            </svg>
+            <div class="video-container">
+                <video autoplay muted loop playsinline id="bg-video">
+                    <source src="PV18_0001_HD - Trim.mov" type="video/mp4" />
+                    Your browser does not support the video tag.
+                </video>
             </div>
         </section>
-
-        <section class="model-section">
-            <div class="text-container">
-                <h2 class="model-title">911 GT3 RS</h2>
-                <div class="model-container">
-                    <div class="placeholder-3d"></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="specs-section">
-            <div class="specs-bg"></div>
-
-            <div class="specs-item">
-                <h3 class="specs-title">520 HP</h3>
-                <p class="specs-desc">
-                    The naturally-aspirated 4.0-liter flat-six engine delivers
-                    exceptional performance with 520 horsepower at 8,400 rpm,
-                    pushing the boundaries of road-legal power.
-                </p>
-            </div>
-
-            <div class="specs-item">
-                <h3 class="specs-title">0-60 MPH IN 3.0 SEC</h3>
-                <p class="specs-desc">
-                    Lightning-fast acceleration combines with precision
-                    engineering to deliver an exhilarating driving experience
-                    that connects driver to machine like nothing else.
-                </p>
-            </div>
-
-            <div class="specs-item">
-                <h3 class="specs-title">AERODYNAMIC MASTERY</h3>
-                <p class="specs-desc">
-                    Featuring a massive rear wing and comprehensive underbody
-                    aerodynamics, the GT3 RS generates twice the downforce of
-                    its predecessor at 124 mph.
-                </p>
-            </div>
-
-            <div class="specs-item">
-                <h3 class="specs-title">TRACK-FOCUSED PRECISION</h3>
-                <p class="specs-desc">
-                    Every element of the 911 GT3 RS is optimized for
-                    performance, from the carbon fiber components to the
-                    race-derived suspension system.
-                </p>
-            </div>
-        </section>
-
-        <footer>
-            <div class="footer-logo">PORSCHE</div>
-            <div class="footer-links">
-                <a href="#">Models</a>
-                <a href="#">Build Your Porsche</a>
-                <a href="#">Find a Dealer</a>
-                <a href="#">Porsche Experience</a>
-                <a href="#">About Porsche</a>
-            </div>
-            <p class="copyright">
-                © 2025 Porsche Cars North America, Inc. Legal notice. Privacy
-                notice.
-            </p>
-        </footer>
-
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                // Register ScrollTrigger plugin
-                gsap.registerPlugin(ScrollTrigger);
-
-                // Hero section text reveal
-                gsap.from(".big-text", {
-                    duration: 1.5,
-                    opacity: 0,
-                    y: 100,
-                    ease: "power4.out",
-                });
-
-                // Model section animations
-                gsap.to(".model-title", {
-                    scrollTrigger: {
-                        trigger: ".model-section",
-                        start: "top 80%",
-                        end: "top 30%",
-                        scrub: 1,
-                    },
-                    opacity: 1,
-                    y: 0,
-                    duration: 1,
-                });
-
-                gsap.to(".placeholder-3d", {
-                    scrollTrigger: {
-                        trigger: ".model-section",
-                        start: "top 60%",
-                        end: "top 10%",
-                        scrub: 1,
-                    },
-                    opacity: 1,
-                    y: 0,
-                    duration: 1.5,
-                });
-
-                // Specs section animations
-                const specsItems = document.querySelectorAll(".specs-item");
-
-                specsItems.forEach((item, index) => {
-                    gsap.to(item, {
-                        scrollTrigger: {
-                            trigger: item,
-                            start: "top 80%",
-                            end: "top 40%",
-                            scrub: 1,
-                        },
-                        opacity: 1,
-                        x: 0,
-                        duration: 1,
-                    });
-                });
-
-                // Parallax effect for specs background
-                gsap.to(".specs-bg", {
-                    scrollTrigger: {
-                        trigger: ".specs-section",
-                        start: "top bottom",
-                        end: "bottom top",
-                        scrub: true,
-                    },
-                    y: "-20%",
-                });
-            });
-        </script>
+        <div id="app"></div>
+        <div class="container">
+            <section id="zero" class="panel"></section>
+            <section id="one" class="panel scroll-section">
+                <h1>GT3 RS</h1>
+            </section>
+            <section id="two" class="panel scroll-section">Section 2</section>
+            <section id="three" class="panel scroll-section">Section 3</section>
+            <section id="four" class="panel scroll-section">Section 4</section>
+        </div>
+        <script type="module" src="src/index.js"></script>
+        <script type="module" src="src/controls.js"></script>
     </body>
 </html>

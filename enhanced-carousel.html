@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Car Features Carousel</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+            }
+
+            .parent-container {
+                font-family: Arial, sans-serif;
+                color: #fff;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                /* Split background - top half white, bottom half black */
+                background: linear-gradient(
+                    to bottom,
+                    #fff 0%,
+                    #fff 50%,
+                    #000 50%,
+                    #000 100%
+                );
+            }
+
+            .carousel-container {
+                position: relative;
+                width: 100%;
+                max-width: 1200px;
+                margin: 0 auto;
+                overflow: hidden;
+                cursor: grab;
+            }
+
+            .carousel-container:active {
+                cursor: grabbing;
+            }
+
+            .carousel {
+                display: flex;
+                transition: transform 0.3s ease;
+            }
+
+            .slide {
+                min-width: 100%;
+                padding: 20px;
+                user-select: none;
+            }
+
+            .slide-content {
+                display: flex;
+                background-color: #111;
+                border-radius: 10px;
+                overflow: hidden;
+                height: 500px;
+                transition: border 0.3s ease;
+            }
+            .slide-content:hover {
+                /* box-shadow: rgba(255, 255, 255, 0.4) 0px 5px,
+                    rgba(255, 255, 255, 0.3) 0px 10px,
+                    rgba(255, 255, 255, 0.2) 0px 15px,
+                    rgba(255, 255, 255, 0.1) 0px 20px,
+                    rgba(255, 255, 255, 0.05) 0px 25px; */
+                border: 2px solid white;
+            }
+
+            .slide-image {
+                flex: 1;
+                overflow: hidden;
+                position: relative;
+            }
+
+            .slide-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                object-position: center;
+            }
+
+            .slide-text {
+                flex: 1;
+                padding: 40px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                background-color: rgba(0, 0, 0, 0.8);
+                position: relative;
+            }
+
+            .slide-text h2 {
+                font-size: 2.5rem;
+                margin-bottom: 20px;
+                font-weight: 700;
+            }
+
+            .description {
+                font-size: 1.1rem;
+                line-height: 1.6;
+                margin-bottom: 20px;
+                transition: max-height 0.5s ease, opacity 0.5s ease;
+                max-height: 300px;
+                overflow: hidden;
+                opacity: 1;
+            }
+
+            .description.collapsed {
+                max-height: 0;
+                opacity: 0;
+                margin-bottom: 0;
+            }
+
+            .toggle-btn {
+                align-self: flex-start;
+                background: none;
+                border: none;
+                color: #fff;
+                font-size: 1rem;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                padding: 5px 0;
+            }
+
+            .toggle-btn::before {
+                content: "";
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                border-left: 2px solid #fff;
+                border-bottom: 2px solid #fff;
+                margin-right: 8px;
+                transform: rotate(-45deg);
+            }
+
+            .toggle-btn.show-more::before {
+                transform: rotate(135deg);
+            }
+
+            .arrow {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(0, 0, 0, 0.5);
+                color: white;
+                border: none;
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                cursor: pointer;
+                border-radius: 50%;
+                z-index: 10;
+            }
+
+            .prev {
+                left: 20px;
+            }
+
+            .next {
+                right: 20px;
+            }
+
+            .pagination {
+                position: absolute;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 10px;
+            }
+
+            .dot {
+                width: 12px;
+                height: 12px;
+                border-radius: 50%;
+                background-color: rgba(255, 255, 255, 0.5);
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            .dot.active {
+                background-color: white;
+                width: 30px;
+                border-radius: 10px;
+            }
+
+            /* Progress bar for drag indication */
+            .progress-container {
+                position: absolute;
+                bottom: -10px;
+                left: 0;
+                width: 100%;
+                height: 5px;
+                background: rgba(255, 255, 255, 0.2);
+                z-index: 5;
+            }
+
+            .progress-bar {
+                height: 100%;
+                background: #fff;
+                width: 33.333%;
+                transition: transform 0.3s ease;
+                transform-origin: left center;
+            }
+
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .slide-content {
+                    flex-direction: column;
+                    height: auto;
+                }
+
+                .slide-image,
+                .slide-text {
+                    flex: none;
+                    width: 100%;
+                }
+
+                .slide-text {
+                    padding: 20px;
+                }
+
+                .slide-text h2 {
+                    font-size: 1.8rem;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="parent-container">
+            <div class="carousel-container">
+                <div class="carousel">
+                    <!-- Slide 1 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <div class="slide-image">
+                                <img
+                                    src="/api/placeholder/600/500"
+                                    alt="Porsche 911 GT3 RS front view"
+                                />
+                            </div>
+                            <div class="slide-text">
+                                <h2>
+                                    S-Duct front with single-cooler concept.
+                                </h2>
+                                <div class="description">
+                                    <p>
+                                        Like GT racing cars, the 911 GT3 RS has
+                                        a single, large central radiator instead
+                                        of the front luggage compartment. The
+                                        S-shaped air guide gives the concept its
+                                        name. The concept ensures outstanding
+                                        aerodynamics in terms of downforce and
+                                        brake cooling.
+                                    </p>
+                                </div>
+                                <button class="toggle-btn">Show less</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 2 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <div class="slide-image">
+                                <img
+                                    src="/api/placeholder/600/500"
+                                    alt="Porsche 911 GT3 RS side view"
+                                />
+                            </div>
+                            <div class="slide-text">
+                                <h2>
+                                    Wide Turbo body with lateral air intakes.
+                                </h2>
+                                <div class="description collapsed">
+                                    <p>
+                                        The wide body design of the 911 GT3 RS
+                                        features distinctive lateral air intakes
+                                        that optimize airflow to the engine and
+                                        cooling systems. This aerodynamic
+                                        enhancement improves performance while
+                                        maintaining the iconic Turbo silhouette
+                                        that has become synonymous with
+                                        Porsche's high-performance models.
+                                    </p>
+                                </div>
+                                <button class="toggle-btn">Show more</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Slide 3 -->
+                    <div class="slide">
+                        <div class="slide-content">
+                            <div class="slide-image">
+                                <img
+                                    src="/api/placeholder/600/500"
+                                    alt="Porsche 911 GT3 RS rear view"
+                                />
+                            </div>
+                            <div class="slide-text">
+                                <h2>Rear wing with DRS functionality.</h2>
+                                <div class="description collapsed">
+                                    <p>
+                                        Inspired by Formula 1 technology, the
+                                        adjustable rear wing incorporates DRS
+                                        (Drag Reduction System) functionality.
+                                        This allows the driver to reduce
+                                        aerodynamic drag on straightaways for
+                                        higher top speeds, while maintaining
+                                        maximum downforce in corners for optimal
+                                        handling and track performance.
+                                    </p>
+                                </div>
+                                <button class="toggle-btn">Show more</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Arrows -->
+                <button class="arrow prev">&#10094;</button>
+                <button class="arrow next">&#10095;</button>
+
+                <!-- Pagination Dots -->
+                <div class="pagination">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Carousel elements
+                const carousel = document.querySelector(".carousel");
+                const slides = document.querySelectorAll(".slide");
+                const dots = document.querySelectorAll(".dot");
+                const prevBtn = document.querySelector(".prev");
+                const nextBtn = document.querySelector(".next");
+                const progressBar = document.querySelector(".progress-bar");
+                const carouselContainer = document.querySelector(
+                    ".carousel-container"
+                );
+
+                let currentIndex = 0;
+                const slideWidth = 100; // percentage
+                const totalSlides = slides.length;
+
+                // Dragging Variables
+                let isDragging = false;
+                let startPos = 0;
+                let currentTranslate = 0;
+                let prevTranslate = 0;
+                let animationID = 0;
+                let currentPosition = 0;
+
+                // Initialize carousel
+                updateCarousel();
+
+                // Toggle description functionality
+                const toggleBtns = document.querySelectorAll(".toggle-btn");
+                toggleBtns.forEach((btn) => {
+                    btn.addEventListener("click", function () {
+                        const description = this.previousElementSibling;
+                        const isCollapsed =
+                            description.classList.contains("collapsed");
+
+                        // Toggle description visibility
+                        description.classList.toggle("collapsed");
+
+                        // Update button text
+                        this.textContent = isCollapsed
+                            ? "Show less"
+                            : "Show more";
+
+                        // Update button icon orientation
+                        this.classList.toggle("show-more", !isCollapsed);
+                    });
+
+                    // Set initial button text based on description state
+                    const description = btn.previousElementSibling;
+                    const isCollapsed =
+                        description.classList.contains("collapsed");
+                    btn.textContent = isCollapsed ? "Show more" : "Show less";
+                    btn.classList.toggle("show-more", isCollapsed);
+                });
+
+                // Navigation buttons
+                prevBtn.addEventListener("click", () => {
+                    currentIndex =
+                        currentIndex > 0 ? currentIndex - 1 : slides.length - 1;
+                    updateCarousel();
+                });
+
+                nextBtn.addEventListener("click", () => {
+                    currentIndex =
+                        currentIndex < slides.length - 1 ? currentIndex + 1 : 0;
+                    updateCarousel();
+                });
+
+                // Pagination dots
+                dots.forEach((dot, index) => {
+                    dot.addEventListener("click", () => {
+                        currentIndex = index;
+                        updateCarousel();
+                    });
+                });
+
+                // Update carousel position and active dot
+                function updateCarousel() {
+                    prevTranslate = currentIndex * -slideWidth;
+                    currentTranslate = prevTranslate;
+                    setSliderPosition();
+
+                    // Update active dot
+                    dots.forEach((dot, index) => {
+                        dot.classList.toggle("active", index === currentIndex);
+                    });
+
+                    // Update progress bar
+                    updateProgressBar();
+                }
+
+                function updateProgressBar() {
+                    const progress = (currentIndex / (totalSlides - 1)) * 100;
+                    progressBar.style.transform = `translateX(${progress}%)`;
+                    progressBar.style.width = `${100 / totalSlides}%`;
+                }
+
+                // Draggable functionality
+                function touchStart(event) {
+                    if (event.type === "touchstart") {
+                        startPos = event.touches[0].clientX;
+                    } else {
+                        startPos = event.clientX;
+
+                        // Prevent default drag behavior
+                        event.preventDefault();
+                    }
+
+                    isDragging = true;
+                    animationID = requestAnimationFrame(animation);
+                    carousel.style.transition = "none";
+                }
+
+                function touchMove(event) {
+                    if (isDragging) {
+                        let currentPosition = 0;
+                        if (event.type === "touchmove") {
+                            currentPosition = event.touches[0].clientX;
+                        } else {
+                            currentPosition = event.clientX;
+                        }
+
+                        const diff = currentPosition - startPos;
+                        const containerWidth = carouselContainer.offsetWidth;
+                        const movePercent = (diff / containerWidth) * 100;
+
+                        // Update the current translate with the movement amount
+                        currentTranslate = prevTranslate + movePercent;
+                    }
+                }
+
+                function touchEnd() {
+                    isDragging = false;
+                    cancelAnimationFrame(animationID);
+
+                    // Calculate which slide to snap to
+                    const movedPercent = currentTranslate - prevTranslate;
+
+                    // Threshold for changing slides (20% of slide width)
+                    const threshold = 20;
+
+                    if (movedPercent > threshold && currentIndex > 0) {
+                        // Moved right enough to go to previous slide
+                        currentIndex--;
+                    } else if (
+                        movedPercent < -threshold &&
+                        currentIndex < slides.length - 1
+                    ) {
+                        // Moved left enough to go to next slide
+                        currentIndex++;
+                    }
+
+                    // Enable transition for the snap effect
+                    carousel.style.transition = "transform 0.3s ease";
+                    updateCarousel();
+                }
+
+                function animation() {
+                    setSliderPosition();
+                    if (isDragging) {
+                        requestAnimationFrame(animation);
+                    }
+                }
+
+                function setSliderPosition() {
+                    // Limit maximum drag beyond first and last slides
+                    const maxDrag = 25; // in percentage
+
+                    if (currentIndex === 0 && currentTranslate > 0) {
+                        currentTranslate = Math.min(currentTranslate, maxDrag);
+                    } else if (
+                        currentIndex === slides.length - 1 &&
+                        currentTranslate < prevTranslate
+                    ) {
+                        currentTranslate = Math.max(
+                            currentTranslate,
+                            prevTranslate - maxDrag
+                        );
+                    }
+
+                    carousel.style.transform = `translateX(${currentTranslate}%)`;
+                }
+
+                // Event Listeners for mouse and touch events
+                carouselContainer.addEventListener("mousedown", touchStart);
+                carouselContainer.addEventListener("touchstart", touchStart);
+                carouselContainer.addEventListener("mousemove", touchMove);
+                carouselContainer.addEventListener("touchmove", touchMove);
+                carouselContainer.addEventListener("mouseup", touchEnd);
+                carouselContainer.addEventListener("touchend", touchEnd);
+                carouselContainer.addEventListener("mouseleave", touchEnd);
+
+                // Prevent context menu on right-click
+                carouselContainer.addEventListener("contextmenu", (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                });
+
+                // Event listeners for toggle buttons to prevent drag interaction
+                toggleBtns.forEach((btn) => {
+                    btn.addEventListener("mousedown", (e) => {
+                        e.stopPropagation();
+                    });
+                    btn.addEventListener("touchstart", (e) => {
+                        e.stopPropagation();
+                    });
+                });
+
+                // Prevent dragging from interfering with dots or arrows
+                const nonDraggableElements = [
+                    ...document.querySelectorAll(".dot"),
+                    ...document.querySelectorAll(".arrow"),
+                ];
+                nonDraggableElements.forEach((el) => {
+                    el.addEventListener("mousedown", (e) => {
+                        e.stopPropagation();
+                    });
+                    el.addEventListener("touchstart", (e) => {
+                        e.stopPropagation();
+                    });
+                });
+            });
+        </script>
+    </body>
+</html>
