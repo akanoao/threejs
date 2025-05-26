@@ -18,6 +18,10 @@
             href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
             rel="stylesheet"
         />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        />
 
         <link rel="stylesheet" href="src/style.css" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -34,7 +38,7 @@
         </script>
     </head>
     <body>
-        <div class="logo">PORSCHE</div>
+        <div class="logo">PORSCHE<span id="fps">--</span> FPS</div>
 
         <div class="nav-dots">
             <div class="nav-dot" data-section="zero"></div>
@@ -42,6 +46,7 @@
             <div class="nav-dot" data-section="two"></div>
             <div class="nav-dot" data-section="three"></div>
             <div class="nav-dot" data-section="four"></div>
+            <div class="nav-dot" data-section="five"></div>
         </div>
 
         <section class="video-section">
@@ -59,6 +64,11 @@
         </section>
 
         <div id="app"></div>
+        <div class="model-change-container">
+            <button id="white-model" class="model-change-button"></button>
+            <button id="red-model" class="model-change-button"></button>
+            <button id="black-model" class="model-change-button"></button>
+        </div>
 
         <div class="container">
             <section id="zero" class="panel">(Scroll Down to Begin)</section>
@@ -242,9 +252,133 @@
             <section id="four" class="panel">
                 <div class="section-number">04</div>
             </section>
+            <section id="five" class="panel">
+                <div class="custom-footer">
+                    <div class="footer-top-row">
+                        <img
+                            src="pics/Group.png"
+                            alt="Logo"
+                            class="footer-logo"
+                        />
+                        <a
+                            href="https://configurator.porsche.com/en-US/mode/model/992850"
+                            target="_blank"
+                            rel="noopener"
+                            style="text-decoration: none; display: inline-block"
+                        >
+                            <button class="white configure-btn">
+                                Configure your car<span
+                                    ><i class="fas fa-external-link-alt"></i
+                                ></span>
+                            </button>
+                        </a>
+                    </div>
+
+                    <div class="footer-columns">
+                        <div class="footer-section">
+                            <h3>Newsletter</h3>
+                            <p>Latest news directly in your inbox</p>
+                            <a
+                                href="https://www.porsche.com/international/newsletter/"
+                                target="_blank"
+                                rel="noopener"
+                                style="
+                                    text-decoration: none;
+                                    display: inline-block;
+                                "
+                                ><button class="btn white">Subscribe</button></a
+                            >
+                        </div>
+
+                        <div class="footer-section">
+                            <h3>Locations & Contacts</h3>
+                            <p>Do you have any questions?</p>
+                            <a
+                                href="https://www.porsche.com/international/locations-and-contact/"
+                                target="_blank"
+                                rel="noopener"
+                                style="
+                                    text-decoration: none;
+                                    display: inline-block;
+                                "
+                            >
+                                <button class="btn white">
+                                    Get in touch
+                                </button></a
+                            >
+                        </div>
+                    </div>
+
+                    <div class="footer-section">
+                        <h3>Social Media</h3>
+                        <p>Get in touch with us via social media.</p>
+                        <div class="social-icons">
+                            <a
+                                href="https://www.facebook.com/porsche/"
+                                target="_blank"
+                                rel="noopener"
+                                ><i class="fab fa-facebook-f"></i
+                            ></a>
+                            <a
+                                href="https://www.instagram.com/porsche/"
+                                target="_blank"
+                                rel="noopener"
+                                ><i class="fab fa-instagram"></i
+                            ></a>
+                            <a
+                                href="https://www.pinterest.com/porsche/"
+                                target="_blank"
+                                rel="noopener"
+                                ><i class="fab fa-pinterest-p"></i
+                            ></a>
+                            <a
+                                href="https://www.youtube.com/user/Porsche"
+                                target="_blank"
+                                rel="noopener"
+                                ><i class="fab fa-youtube"></i
+                            ></a>
+                            <a
+                                href="https://twitter.com/porsche"
+                                target="_blank"
+                                rel="noopener"
+                                ><i class="fab fa-x-twitter"></i
+                            ></a>
+                            <a
+                                href="https://www.linkedin.com/company/porsche-ag"
+                                target="_blank"
+                                rel="noopener"
+                                ><i class="fab fa-linkedin-in"></i
+                            ></a>
+                        </div>
+                    </div>
+                    <div class="footer-bottom-row">
+                        <img src="pics/Vector.png" alt="porsche-text-logo" />
+                    </div>
+                </div>
+            </section>
         </div>
 
-        <script type="module" src="src/clindex.js"></script>
+        <script type="module" src="src/index.js"></script>
         <script src="src/carousel.js"></script>
+        <script>
+            var fps = document.getElementById("fps");
+            var startTime = Date.now();
+            var frame = 0;
+
+            function tick() {
+                var time = Date.now();
+                frame++;
+                if (time - startTime > 1000) {
+                    fps.innerHTML = (
+                        frame /
+                        ((time - startTime) / 1000)
+                    ).toFixed(1);
+                    startTime = time;
+                    frame = 0;
+                }
+                window.requestAnimationFrame(tick);
+            }
+            tick();
+        </script>
     </body>
 </html>

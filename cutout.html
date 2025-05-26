@@ -23,10 +23,6 @@
             overflow: hidden; /* Prevents scrollbars if text/video slightly overflows */
             background-color: white; /* Black background is important for screen blend mode */
             font-family: "Anton", sans-serif; /* Use a bold font - Anton is a good example */
-            /* background-image: url("./public/andrea-cau-nV7GJmSq3zc-unsplash.jpg");
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed; */
             background-color: rgba(
                 0,
                 0,
@@ -63,15 +59,25 @@
         }
     </style>
     <body>
-        <svg class="clipping-paths">
-            <defs>
-                <clipPath
-                    id="clip-00"
-                    clipPathUnits="objectBoundingBox"
-                    transform="scale(0.0005208333333333333, 0.000925925925925926)"
-                >
-                    <path
-                        d="M 18.841207,236.34251
+        <div class="video-container">
+            <video autoplay muted loop playsinline id="bg-video">
+                <source
+                    src="C:\Users\ASUS\Desktop\WEBDEV\threejs\public\PV18_0001_HD - Trim.mov"
+                    type="video/mp4"
+                />
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <div>
+            <svg class="clipping-paths">
+                <defs>
+                    <clipPath
+                        id="clip-00"
+                        clipPathUnits="objectBoundingBox"
+                        transform="scale(0.0005208333333333333, 0.000925925925925926)"
+                    >
+                        <path
+                            d="M 18.841207,236.34251
                     H 128.39531
                     q 44.44176,0 68.21293,6.97632 24.02956,6.97632 35.91515,20.15382 12.14396,13.1775 16.27808,32.03941 4.3925,18.60353 4.3925,57.87764
                     v 36.43191
@@ -169,20 +175,22 @@
                     v 83.71587
                     H 1718.997
                     Z"
-                    />
-                </clipPath>
-            </defs>
-        </svg>
-        <div class="video-container">
-            <video autoplay muted loop playsinline id="bg-video">
-                <source
-                    src="C:\Users\ASUS\Downloads\PV18_0001_HD - Trim.mov"
-                    type="video/mp4"
-                />
-                Your browser does not support the video tag.
-            </video>
+                        />
+                    </clipPath>
+                </defs>
+            </svg>
         </div>
+
         <div id="app"></div>
         <script type="module" src="src/index.js"></script>
     </body>
 </html>
+
+<!-- <div id="footer-bub">
+    <div class="footer-logo">
+        <img src="pics/Group.png" alt="Porsche Logo" />
+    </div>
+    <div class="footer-text">
+        <div class="footer-button">hi</div>
+    </div>
+</div> -->
