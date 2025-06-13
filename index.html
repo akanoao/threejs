@@ -38,15 +38,14 @@
         <section class="video-section">
             <div class="vignette"></div>
             <div class="video-container">
-                <!-- <video autoplay muted loop playsinline id="bg-video">
+                <video autoplay muted loop playsinline id="bg-video">
                     <source
-                        src="PV18_0001_HD-Trim.mov"
+                        src="PV18_0001_HD-Trim.mp4"
                         type="video/mp4"
                         onerror="this.parentElement.innerHTML = '<p style=\'color: red; text-align: center; padding-top: 40vh;\'>Error loading video.</p>';"
                     />
                     Your browser does not support the video tag.
-                </video> -->
-                <div id="yt-player"></div>
+                </video>
             </div>
         </section>
 
@@ -347,30 +346,5 @@
 
         <script type="module" src="/src/index.js"></script>
         <script type="module" src="/src/carousel.js"></script>
-        <script>
-            let player;
-            function onYouTubeIframeAPIReady() {
-                player = new YT.Player("yt-player", {
-                    videoId: "tMGqbUffe3U",
-                    playerVars: {
-                        autoplay: 1,
-                        controls: 0,
-                        showinfo: 0,
-                        modestbranding: 1,
-                        loop: 1,
-                        mute: 1,
-                        playlist: "tMGqbUffe3U", // Required for loop
-                        rel: 0,
-                        playsinline: 1,
-                    },
-                    events: {
-                        onReady: (event) => {
-                            event.target.playVideo();
-                        },
-                    },
-                });
-            }
-            onYouTubeIframeAPIReady();
-        </script>
     </body>
 </html>
