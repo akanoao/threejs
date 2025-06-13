@@ -1,7 +1,12 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RGBELoader } from "three/addons/loaders/RGBELoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+import ScrollToPlugin from "gsap/ScrollToPlugin";
 
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 // === GSAP & ScrollTrigger Setup ===
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
@@ -18,20 +23,19 @@ let camera,
 
 // --- Initialization ---
 document.addEventListener("DOMContentLoaded", () => {
-    setupNavDots();
     carStats();
     setupSnapScrolling();
     animateIntro();
     setupSectionTextAnimations();
     initThreeJS();
     document.getElementById("black-model").addEventListener("click", () => {
-        loadCarModel("blackcar.glb"); // Path to your new model
+        loadCarModel("car_model_draco_black.glb"); // Path to your new model
     });
     document.getElementById("white-model").addEventListener("click", () => {
-        loadCarModel("whitecar.glb"); // Path to your new model
+        loadCarModel("car_model_draco_white.glb"); // Path to your new model
     });
     document.getElementById("red-model").addEventListener("click", () => {
-        loadCarModel("sussycarred.glb"); // Path to your new model
+        loadCarModel("car_model_draco_red.glb"); // Path to your new model
     });
 
     // Optional: Fade video slightly on deep scroll for effect (can be added later)
@@ -122,59 +126,6 @@ function setupSnapScrolling() {
 }
 
 /**
- * Sets up click events for navigation dots and updates active dot based on scroll.
- */
-function setupNavDots() {
-    const navDots = document.querySelectorAll(".nav-dot");
-    const sections = document.querySelectorAll(".panel"); // Get all panels
-
-    // Create ScrollTriggers for each section to update the active dot
-    sections.forEach((section, index) => {
-        ScrollTrigger.create({
-            trigger: section,
-            start: "top center+=10%", // Trigger slightly past the center when scrolling down
-            end: "bottom center-=10%", // End trigger slightly before center when scrolling down
-            // markers: true, // Uncomment for debugging dot triggers
-            onEnter: () => setActiveDot(section.id), // Update dot when entering section view
-            onEnterBack: () => setActiveDot(section.id), // Update dot when scrolling back into section view
-        });
-    });
-
-    // Add click event to navigation dots for smooth scrolling
-    navDots.forEach((dot) => {
-        dot.addEventListener("click", () => {
-            const targetSectionId = dot.getAttribute("data-section");
-            const targetSection = document.getElementById(targetSectionId);
-            if (targetSection) {
-                // Use GSAP's ScrollToPlugin for smooth scrolling
-                gsap.to(window, {
-                    scrollTo: {
-                        y: targetSection, // Target element to scroll to
-                        offsetY: 1, // Small offset to ensure trigger fires correctly
-                    },
-                    duration: 1.2, // Duration of the scroll animation
-                    ease: "power2.inOut", // Easing function
-                });
-            }
-        });
-    });
-}
-
-/**
- * Updates the visual state of navigation dots.
- * @param {string} sectionId - The ID of the currently active section.
- */
-function setActiveDot(sectionId) {
-    document.querySelectorAll(".nav-dot").forEach((dot) => {
-        if (dot.getAttribute("data-section") === sectionId) {
-            dot.classList.add("active");
-        } else {
-            dot.classList.remove("active");
-        }
-    });
-}
-
-/**
  * Creates the initial fade-in/pop-in animation for static UI elements.
  */
 function animateIntro() {
@@ -187,19 +138,6 @@ function animateIntro() {
         duration: 1,
         ease: "power3.out",
     });
-
-    // Animate navigation dots scaling in with a stagger effect
-    tl.from(
-        ".nav-dots", // Corrected target to individual dots
-        {
-            scale: 0,
-            opacity: 0,
-            duration: 0.5,
-            stagger: 0.1, // Animate dots one after another
-            ease: "back.out(1.7)", // Add a slight overshoot effect
-        },
-        "-=0.5" // Overlap start slightly with logo animation
-    );
 }
 
 /**
@@ -269,7 +207,11 @@ function setupSectionTextAnimations() {
 // --- Three.js Setup Functions ---
 
 function loadCarModel(path) {
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath("https://www.gstatic.com/draco/v1/decoders/"); // Set path to Draco decoder
+    dracoLoader.setDecoderConfig({ type: "wasm" }); // Use JavaScript decoder
     const loader = new GLTFLoader();
+    loader.setDRACOLoader(dracoLoader);
     loader.load(
         path,
         (gltf) => {
@@ -304,7 +246,7 @@ function loadCarModel(path) {
                         if (child.material.roughness !== undefined) {
                             child.material.roughness = Math.max(
                                 child.material.roughness,
-                                0.1
+                                0
                             );
                         }
                         child.material.needsUpdate = true;
@@ -314,7 +256,7 @@ function loadCarModel(path) {
 
             scene.add(carModel);
             setupScrollAnimations();
-            animate();
+            // animate();
         },
         undefined, // Progress callback removed for brevity
         (error) => {
@@ -355,12 +297,19 @@ function initThreeJS() {
     scene = new THREE.Scene();
     scene.background = null;
 
+    const pmremGenerator = new THREE.PMREMGenerator(renderer);
+    pmremGenerator.compileEquirectangularShader();
+
     new RGBELoader().setPath("./hdr/").load(
-        "modern_buildings_4k.hdr",
+        "modern_buildings_2k.hdr",
         (texture) => {
-            texture.mapping = THREE.EquirectangularReflectionMapping;
-            scene.environment = texture;
+            const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+            // texture.mapping = THREE.EquirectangularReflectionMapping;
+            // scene.environment = texture;
+            scene.environment = envMap;
             scene.environmentIntensity = 0.3;
+            texture.dispose();
+            pmremGenerator.dispose();
             console.log("HDR Environment map loaded successfully.");
         },
         undefined,
@@ -384,7 +333,9 @@ function initThreeJS() {
     scene.add(ground);
 
     // Load the car model
-    loadCarModel("sussycarred.glb");
+    // setupScrollAnimations();
+    animate();
+    loadCarModel("car_model_draco_red.glb");
     window.addEventListener("resize", onWindowResize);
 }
 /**

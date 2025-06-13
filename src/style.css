@@ -39,6 +39,7 @@ body {
     background-color: rgba(0, 0, 0, 0.8); /* Dark overlay */
     z-index: 1; /* Behind content, above background */
     overflow: hidden; /* Ensure video doesn't overflow */
+    pointer-events: none;
 }
 
 #bg-video {
@@ -46,12 +47,22 @@ body {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* Center the video */
+    transform: translate(-50%, -50%);
     min-width: 100%;
     min-height: 100%;
     width: auto;
     height: auto;
-    object-fit: cover; /* Ensure video aspect ratio is maintained */
+    object-fit: cover;
+}
+
+#yt-player {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 120vw;
+    height: 140vh;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
 }
 
 /* Three.js Canvas Container */
@@ -152,7 +163,7 @@ h2 {
 #three {
     color: #fff;
     display: flex;
-    padding-bottom: 3vw;
+    padding-bottom: 5vh;
     justify-content: flex-end;
     width: 100%;
     height: 100vh; /* Full height for the carousel */
@@ -208,21 +219,6 @@ h2 {
 
 .footer-logo {
     height: 14vh;
-}
-
-.configure-btn {
-    padding: 4vh 13.5vw;
-    font-weight: bold;
-    white-space: nowrap;
-    border: none;
-    font-size: 3vh;
-    cursor: pointer;
-    border-radius: 1vh;
-}
-
-.configure-btn span {
-    margin-left: 10px;
-    display: inline-block;
 }
 
 .footer-columns {
@@ -292,7 +288,7 @@ h2 {
 }
 
 .social-icons a:hover {
-    background-color: #ddd;
+    background-color: #b3b3b3;
 }
 
 .footer-bottom-row {
@@ -301,8 +297,26 @@ h2 {
     align-items: center;
 }
 
+.configure-btn {
+    padding: 4vh 13.5vw;
+    font-weight: bold;
+    white-space: nowrap;
+    border: none;
+    font-size: 3vh;
+    cursor: pointer;
+    border-radius: 1vh;
+    transition: background-color 0.3s ease;
+}
+
+.configure-btn span {
+    margin-left: 10px;
+    display: inline-block;
+}
+.configure-btn:hover {
+    background-color: #b3b3b3;
+}
 .footer-bottom-row img {
-    margin-top: 3vh;
+    margin-top: 5vh;
     height: 3vh;
 }
 
@@ -381,36 +395,6 @@ h2 {
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-}
-
-/* Navigation dots */
-.nav-dots {
-    position: fixed;
-    right: 3vw;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 11; /* Above everything */
-    display: flex;
-    flex-direction: column;
-    gap: 2vh;
-    /* Removed initial opacity here */
-    pointer-events: auto; /* Allow clicking dots */
-}
-
-.nav-dot {
-    width: 1vw;
-    height: 1vw;
-    min-width: 10px; /* Minimum size */
-    min-height: 10px;
-    border-radius: 50%;
-    background-color: rgb(153, 153, 155);
-    transition: all 0.3s ease;
-    cursor: pointer; /* Indicate clickable */
-}
-
-.active {
-    background-color: #b12b28; /* Porsche Red */
-    transform: scale(1.3);
 }
 
 /* cars stats */

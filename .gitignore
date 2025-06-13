@@ -22,4 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-public/
+extra_assets/
+cutout.html
+public/PV18_0001_HD-Trim.mov

@@ -3,7 +3,14 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- add logo in title -->
+        <link rel="icon" href="./pics/Group.png" type="image/x-icon" />
+        <meta
+            name="description"
+            content="Experience the Porsche 911 GT3 RS with its high-performance features, aerodynamic design, and cutting-edge technology. Discover specifications, images, and more about this iconic sports car."
+        />
         <title>Porsche GT3 RS Experience</title>
+        <script src="https://www.youtube.com/iframe_api"></script>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
@@ -23,43 +30,23 @@
             href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
         />
 
-        <link rel="stylesheet" href="src/style.css" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
-
-        <script type="importmap">
-            {
-                "imports": {
-                    "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
-                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
-                }
-            }
-        </script>
+        <link rel="stylesheet" href="/src/style.css" />
     </head>
     <body>
-        <div class="logo">PORSCHE<span id="fps">--</span> FPS</div>
-
-        <div class="nav-dots">
-            <div class="nav-dot" data-section="zero"></div>
-            <div class="nav-dot" data-section="one"></div>
-            <div class="nav-dot" data-section="two"></div>
-            <div class="nav-dot" data-section="three"></div>
-            <div class="nav-dot" data-section="four"></div>
-            <div class="nav-dot" data-section="five"></div>
-        </div>
+        <div class="logo">PORSCHE</div>
 
         <section class="video-section">
             <div class="vignette"></div>
             <div class="video-container">
-                <video autoplay muted loop playsinline id="bg-video">
+                <!-- <video autoplay muted loop playsinline id="bg-video">
                     <source
-                        src="PV18_0001_HD - Trim.mov"
+                        src="PV18_0001_HD-Trim.mov"
                         type="video/mp4"
                         onerror="this.parentElement.innerHTML = '<p style=\'color: red; text-align: center; padding-top: 40vh;\'>Error loading video.</p>';"
                     />
                     Your browser does not support the video tag.
-                </video>
+                </video> -->
+                <div id="yt-player"></div>
             </div>
         </section>
 
@@ -358,27 +345,32 @@
             </section>
         </div>
 
-        <script type="module" src="src/index.js"></script>
-        <script src="src/carousel.js"></script>
+        <script type="module" src="/src/index.js"></script>
+        <script type="module" src="/src/carousel.js"></script>
         <script>
-            var fps = document.getElementById("fps");
-            var startTime = Date.now();
-            var frame = 0;
-
-            function tick() {
-                var time = Date.now();
-                frame++;
-                if (time - startTime > 1000) {
-                    fps.innerHTML = (
-                        frame /
-                        ((time - startTime) / 1000)
-                    ).toFixed(1);
-                    startTime = time;
-                    frame = 0;
-                }
-                window.requestAnimationFrame(tick);
+            let player;
+            function onYouTubeIframeAPIReady() {
+                player = new YT.Player("yt-player", {
+                    videoId: "tMGqbUffe3U",
+                    playerVars: {
+                        autoplay: 1,
+                        controls: 0,
+                        showinfo: 0,
+                        modestbranding: 1,
+                        loop: 1,
+                        mute: 1,
+                        playlist: "tMGqbUffe3U", // Required for loop
+                        rel: 0,
+                        playsinline: 1,
+                    },
+                    events: {
+                        onReady: (event) => {
+                            event.target.playVideo();
+                        },
+                    },
+                });
             }
-            tick();
+            onYouTubeIframeAPIReady();
         </script>
     </body>
 </html>
